@@ -1,27 +1,34 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { long, short } from './i18n'
+import { alertInstall, alertUninstall, long, short } from './i18n'
 
 export const manifest = setupManifest({
-  id: 'hello-world',
-  title: 'Hello World',
-  license: 'MIT',
-  packageRepo: 'https://github.com/Start9Labs/hello-world-startos',
-  upstreamRepo: 'https://github.com/Start9Labs/hello-world',
-  marketingUrl: 'https://start9.com/',
-  donationUrl: 'https://donate.start9.com/',
-  docsUrls: ['https://github.com/Start9Labs/hello-world/blob/master/README.md'],
+  id: 'vikunja',
+  title: 'Vikunja',
+  license: 'AGPL-3.0',
+  packageRepo: 'https://github.com/Start9Labs/vikunja-startos',
+  upstreamRepo: 'https://github.com/go-vikunja/vikunja',
+  marketingUrl: 'https://vikunja.io/',
+  donationUrl: 'https://opencollective.com/vikunja',
+  docsUrls: [
+    'https://vikunja.io/docs/',
+    'https://vikunja.io/docs/config-options/',
+  ],
   description: { short, long },
   volumes: ['main'],
   images: {
-    'hello-world': {
-      source: { dockerTag: 'ghcr.io/start9labs/hello-world:2.0.0' },
-      arch: ['x86_64', 'aarch64', 'riscv64'],
+    vikunja: {
+      source: { dockerTag: 'vikunja/vikunja:2.3.0' },
+      arch: ['x86_64', 'aarch64'],
+    },
+    busybox: {
+      source: { dockerTag: 'docker.io/busybox:1.36.1-musl' },
+      arch: ['x86_64', 'aarch64'],
     },
   },
   alerts: {
-    install: null,
+    install: alertInstall,
     update: null,
-    uninstall: null,
+    uninstall: alertUninstall,
     restore: null,
     start: null,
     stop: null,

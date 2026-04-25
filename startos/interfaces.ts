@@ -3,14 +3,14 @@ import { sdk } from './sdk'
 import { uiPort } from './utils'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
-  const uiMulti = sdk.MultiHost.of(effects, 'ui-multi')
-  const uiMultiOrigin = await uiMulti.bindPort(uiPort, {
+  const multi = sdk.MultiHost.of(effects, 'main')
+  const origin = await multi.bindPort(uiPort, {
     protocol: 'http',
   })
-  const ui = sdk.createInterface(effects, {
+  const webui = sdk.createInterface(effects, {
     name: i18n('Web UI'),
-    id: 'ui',
-    description: i18n('The web interface of Hello World'),
+    id: 'webui',
+    description: i18n('The Vikunja web interface'),
     type: 'ui',
     masked: false,
     schemeOverride: null,
@@ -19,7 +19,7 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     query: {},
   })
 
-  const uiReceipt = await uiMultiOrigin.export([ui])
+  const receipt = await origin.export([webui])
 
-  return [uiReceipt]
+  return [receipt]
 })
