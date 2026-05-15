@@ -1,5 +1,5 @@
 import { T } from '@start9labs/start-sdk'
-import { storeJson } from './fileModels/store.json'
+import { defaultMaxAttachmentSize, storeJson } from './fileModels/store.json'
 import { sdk } from './sdk'
 
 export const uiPort = 3456 as const
@@ -18,6 +18,8 @@ export const dataMount = sdk.Mounts.of().mountVolume({
 })
 
 /**
+ * Scratch-image /etc/passwd plant.
+ *
  * The upstream `vikunja/vikunja` image is `FROM scratch` with `USER 1000`.
  * Scratch has no `/etc/passwd` or `/etc/group`, so start-container's USER
  * resolution fails. We plant minimal entries for root:0:0 and vikunja:1000:1000
@@ -29,10 +31,7 @@ const PASSWD_CONTENT =
 const GROUP_CONTENT = `root:x:0:\nvikunja:x:${VIKUNJA_GID}:\n`
 
 export async function plantPasswd(sub: {
-  writeFile: (
-    path: string,
-    data: string,
-  ) => Promise<void>
+  writeFile: (path: string, data: string) => Promise<void>
 }): Promise<void> {
   await sub.writeFile('/etc/passwd', PASSWD_CONTENT)
   await sub.writeFile('/etc/group', GROUP_CONTENT)
@@ -45,11 +44,7 @@ export async function plantPasswd(sub: {
  */
 export async function getPrimaryUrls(effects: T.Effects): Promise<string[]> {
   return sdk.serviceInterface
-    .getOwn(
-      effects,
-      'webui',
-      (i) => i?.addressInfo?.nonLocal.format() || [],
-    )
+    .getOwn(effects, 'webui', (i) => i?.addressInfo?.nonLocal.format() || [])
     .const()
 }
 
@@ -69,7 +64,10 @@ export interface ResolvedSmtp {
  */
 export function buildMailerEnv(
   resolved: ResolvedSmtp,
-  advanced: { skipTlsVerify: boolean; authType: 'plain' | 'login' | 'cram-md5' },
+  advanced: {
+    skipTlsVerify: boolean
+    authType: 'plain' | 'login' | 'cram-md5'
+  },
 ): Record<string, string> {
   const env: Record<string, string> = {
     VIKUNJA_MAILER_ENABLED: 'true',
@@ -109,9 +107,9 @@ export async function resolveSmtpEnv(
   if (sel === 'system') {
     const sys = await sdk.getSystemSmtp(effects).const()
     if (!sys) return { VIKUNJA_MAILER_ENABLED: 'false' }
-    const customFrom =
-      (store?.smtp as { value?: { customFrom?: string } } | undefined)?.value
-        ?.customFrom
+    const customFrom = (
+      store?.smtp as { value?: { customFrom?: string } } | undefined
+    )?.value?.customFrom
     return buildMailerEnv(
       {
         host: sys.host,
@@ -126,19 +124,26 @@ export async function resolveSmtpEnv(
   }
 
   if (sel === 'custom') {
-    const value = (store?.smtp as {
-      value?: {
-        provider: {
-          value: {
-            host: string
-            from: string
-            username: string
-            password?: string | null
-            security: { selection: 'tls' | 'starttls'; value: { port: string } }
+    const value = (
+      store?.smtp as
+        | {
+            value?: {
+              provider: {
+                value: {
+                  host: string
+                  from: string
+                  username: string
+                  password?: string | null
+                  security: {
+                    selection: 'tls' | 'starttls'
+                    value: { port: string }
+                  }
+                }
+              }
+            }
           }
-        }
-      }
-    } | undefined)?.value
+        | undefined
+    )?.value
 
     if (!value) return { VIKUNJA_MAILER_ENABLED: 'false' }
     const p = value.provider.value
@@ -159,12 +164,15 @@ export async function resolveSmtpEnv(
 }
 
 /**
+ * Shared env fragment for daemon and CLI subcontainers.
+ *
  * The full env fragment passed to both the long-lived daemon and every
  * temp CLI subcontainer. Pulls the currently-stored values reactively.
  *
- * Pitfall #4: every CLI subcontainer needs the SAME env as the daemon,
- * not just the database path — otherwise e.g. CORS links or email templates
- * break silently.
+ * Every CLI subcontainer needs the SAME env as the daemon, not just the
+ * database path — otherwise CORS links or email templates break silently
+ * (e.g. `vikunja user create` composes confirmation emails using
+ * VIKUNJA_SERVICE_PUBLICURL).
  */
 export async function getVikunjaEnv(
   effects: T.Effects,
@@ -192,10 +200,18 @@ export async function getVikunjaEnv(
     VIKUNJA_SERVICE_TIMEZONE: 'UTC',
     VIKUNJA_SERVICE_ENABLECALDAV: 'true',
     VIKUNJA_SERVICE_ENABLETOTP: 'true',
-    VIKUNJA_SERVICE_ENABLEREGISTRATION: store?.enableRegistration ? 'true' : 'false',
-    VIKUNJA_SERVICE_ENABLELINKSHARING: store?.enableLinkSharing ? 'true' : 'false',
-    VIKUNJA_SERVICE_ENABLEUSERDELETION: store?.enableUserDeletion ? 'true' : 'false',
-    VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: store?.enableEmailReminders ? 'true' : 'false',
+    VIKUNJA_SERVICE_ENABLEREGISTRATION: store?.enableRegistration
+      ? 'true'
+      : 'false',
+    VIKUNJA_SERVICE_ENABLELINKSHARING: store?.enableLinkSharing
+      ? 'true'
+      : 'false',
+    VIKUNJA_SERVICE_ENABLEUSERDELETION: store?.enableUserDeletion
+      ? 'true'
+      : 'false',
+    VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: store?.enableEmailReminders
+      ? 'true'
+      : 'false',
 
     // Database
     VIKUNJA_DATABASE_TYPE: 'sqlite',
@@ -203,7 +219,7 @@ export async function getVikunjaEnv(
 
     // Files
     VIKUNJA_FILES_BASEPATH: `${DATA_MOUNT}/${FILES_SUBPATH}`,
-    VIKUNJA_FILES_MAXSIZE: store?.maxAttachmentSize || '20MB',
+    VIKUNJA_FILES_MAXSIZE: store?.maxAttachmentSize || defaultMaxAttachmentSize,
 
     // Mailer (may include VIKUNJA_MAILER_ENABLED=false and nothing else)
     ...smtpEnv,
@@ -236,4 +252,18 @@ export async function withVikunjaCli<T>(
       return fn(sub, env)
     },
   )
+}
+
+/**
+ * Vikunja boots its full runtime for every CLI invocation, so most command
+ * output is prefixed with structured `time=YYYY-MM-DDT… level=INFO …` log
+ * lines from migration and mailer init. Strip those — the user wants the
+ * command's actual output, not the bootstrap noise.
+ */
+export function stripVikunjaLogs(text: string): string {
+  return text
+    .split('\n')
+    .filter((line) => !/^time=\d{4}-\d{2}-\d{2}T/.test(line.trim()))
+    .join('\n')
+    .trim()
 }

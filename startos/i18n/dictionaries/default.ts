@@ -59,7 +59,7 @@ const dict = {
   'User Created': 55,
   'User created. Save the credentials.': 56,
   'Maximum Attachment Size': 57,
-  'Maximum upload size for task attachments, as a human-readable string (e.g. 20MB, 200MB, 2GB). Vikunja defaults to 20MB.': 58,
+  'Maximum upload size for task attachments, as a human-readable string (e.g. 20MB, 200MB, 2GB).': 58,
   'Set Max Attachment Size': 59,
   'Change the maximum size of task attachments users can upload.': 60,
   'Valid email address. Used for password reset and notifications.': 61,
@@ -105,10 +105,17 @@ const dict = {
   'Raw Output': 101,
   'A test email was sent to ${to}. Check the recipient inbox; if it does not arrive, review the SMTP settings and the Vikunja logs.': 102,
   '${count} user(s).': 103,
-  'User': 104,
+  User: 104,
   'See the output below for diagnostic details.': 105,
   'Diagnostic Output': 106,
   ID: 107,
+  'No spaces or commas.': 108,
+  'Cannot look like a URL.': 109,
+  '"link-share-<number>" is reserved.': 110,
+  'Must be a valid email address.': 111,
+  'Enter a size like 20MB, 500MB, or 2GB.': 112,
+  Accounts: 113,
+  Other: 114,
 } as const
 
 /**

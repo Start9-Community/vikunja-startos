@@ -1,16 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { withVikunjaCli } from '../utils'
-
-// Drop Vikunja's bootstrap log lines (`time=... level=INFO ...`) so the
-// dialog only shows the actual command output.
-function stripVikunjaLogs(text: string): string {
-  return text
-    .split('\n')
-    .filter((line) => !/^time=\d{4}-\d{2}-\d{2}T/.test(line.trim()))
-    .join('\n')
-    .trim()
-}
+import { stripVikunjaLogs, withVikunjaCli } from '../utils'
 
 type ParsedUser = { id: string; username: string; email: string }
 
@@ -25,7 +15,10 @@ function parseUserTable(text: string): ParsedUser[] {
     .map((line) => line.trim())
     .filter((line) => line.startsWith('│') && line.endsWith('│'))
     .map((row) => {
-      const cells = row.slice(1, -1).split('│').map((c) => c.trim())
+      const cells = row
+        .slice(1, -1)
+        .split('│')
+        .map((c) => c.trim())
       return {
         id: cells[0] ?? '',
         username: cells[1] ?? '',
@@ -43,7 +36,7 @@ export const userList = sdk.Action.withoutInput(
     description: i18n('Show every Vikunja user, with ID, username, and email.'),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Accounts (User mgmt)',
+    group: i18n('Accounts'),
     visibility: 'enabled',
   },
 

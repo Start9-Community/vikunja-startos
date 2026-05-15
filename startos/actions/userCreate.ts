@@ -15,14 +15,14 @@ const inputSpec = InputSpec.of({
     minLength: 3,
     maxLength: 250,
     patterns: [
-      { regex: '^[^\\s,]+$', description: 'No spaces or commas.' },
+      { regex: '^[^\\s,]+$', description: i18n('No spaces or commas.') },
       {
         regex: '^(?!https?://)(?!ftp://)(?!www\\.).*$',
-        description: 'Cannot look like a URL.',
+        description: i18n('Cannot look like a URL.'),
       },
       {
         regex: '^(?!link-share-\\d+$).*$',
-        description: '"link-share-<number>" is reserved.',
+        description: i18n('"link-share-<number>" is reserved.'),
       },
     ],
   }),
@@ -36,7 +36,7 @@ const inputSpec = InputSpec.of({
     patterns: [
       {
         regex: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
-        description: 'Must be a valid email address.',
+        description: i18n('Must be a valid email address.'),
       },
     ],
   }),
@@ -61,7 +61,7 @@ export const userCreate = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Accounts (User mgmt)',
+    group: i18n('Accounts'),
     visibility: 'enabled',
   },
 

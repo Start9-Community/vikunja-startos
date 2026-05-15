@@ -34,7 +34,7 @@ export const toggleEmailReminders = sdk.Action.withoutInput(
             )
           : null,
       allowedStatuses: 'any',
-      group: 'Email',
+      group: i18n('Email'),
       visibility: 'enabled',
     }
   },

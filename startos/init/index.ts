@@ -8,8 +8,7 @@ import { ensureSecret } from './ensureSecret'
 import { initVolumeLayout } from './initVolumeLayout'
 import { seedFiles } from './seedFiles'
 import { setupPrimaryUrl } from './setupPrimaryUrl'
-import { tasksOnInstall } from './tasksOnInstall'
-import { watchSystemSmtp } from './watchSystemSmtp'
+import { watchInitialUser } from './watchInitialUser'
 
 export const init = sdk.setupInit(
   restoreInit,
@@ -20,9 +19,8 @@ export const init = sdk.setupInit(
   setInterfaces,
   setDependencies,
   actions,
-  tasksOnInstall,
+  watchInitialUser,
   setupPrimaryUrl,
-  watchSystemSmtp,
 )
 
 export const uninit = sdk.setupUninit(versionGraph)

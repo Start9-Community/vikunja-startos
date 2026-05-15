@@ -3,10 +3,12 @@ import { storeJson } from '../fileModels/store.json'
 import { sdk } from '../sdk'
 
 /**
- * Pitfall #8: Vikunja's service.secret defaults to a random value generated
- * at each startup. That invalidates every existing JWT on every container
- * restart — so every user gets logged out. We generate a persistent secret
- * once on install, store it, and inject via VIKUNJA_SERVICE_SECRET.
+ * Persistent JWT secret.
+ *
+ * Vikunja's `service.secret` defaults to a random value generated at each
+ * startup. That invalidates every existing JWT on every container restart —
+ * so every user gets logged out. We generate a persistent secret once on
+ * install, store it, and inject via VIKUNJA_SERVICE_SECRET.
  *
  * On 'restore' the restored store.json already contains a secret.
  * On 'update' we preserve the existing secret (don't regenerate — that

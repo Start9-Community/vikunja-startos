@@ -6,9 +6,7 @@ export const toggleRegistration = sdk.Action.withoutInput(
   'toggle-registration',
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableRegistration)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableRegistration).const(effects)
     return {
       name: on ? i18n('Disable Registration') : i18n('Enable Registration'),
       description: on
@@ -24,15 +22,13 @@ export const toggleRegistration = sdk.Action.withoutInput(
             'Anyone who can reach your Vikunja URL will be able to create an account on your instance. Disable this again as soon as your users have signed up.',
           ),
       allowedStatuses: 'any',
-      group: 'Accounts (User mgmt)',
+      group: i18n('Accounts'),
       visibility: 'enabled',
     }
   },
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableRegistration)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableRegistration).const(effects)
     await storeJson.merge(effects, { enableRegistration: !on })
   },
 )

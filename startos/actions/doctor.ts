@@ -1,18 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { withVikunjaCli } from '../utils'
-
-// Vikunja boots its full runtime even for `doctor`, so the output is
-// prefixed with structured `time=... level=...` log lines from migration
-// and mailer init. Strip those — the user wants the diagnostic output,
-// not the bootstrap noise.
-function stripVikunjaLogs(text: string): string {
-  return text
-    .split('\n')
-    .filter((line) => !/^time=\d{4}-\d{2}-\d{2}T/.test(line.trim()))
-    .join('\n')
-    .trim()
-}
+import { stripVikunjaLogs, withVikunjaCli } from '../utils'
 
 export const doctor = sdk.Action.withoutInput(
   'doctor',
@@ -24,7 +12,7 @@ export const doctor = sdk.Action.withoutInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Other',
+    group: i18n('Other'),
     visibility: 'enabled',
   },
 
@@ -33,10 +21,10 @@ export const doctor = sdk.Action.withoutInput(
       effects,
       'vikunja-doctor',
       async (sub, env) => {
-        const res = await sub.exec(
-          ['/app/vikunja/vikunja', 'doctor'],
-          { env, user: 'vikunja' },
-        )
+        const res = await sub.exec(['/app/vikunja/vikunja', 'doctor'], {
+          env,
+          user: 'vikunja',
+        })
         return [res.stdout.toString(), res.stderr.toString()]
           .map(stripVikunjaLogs)
           .filter(Boolean)

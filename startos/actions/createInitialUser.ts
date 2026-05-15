@@ -18,15 +18,15 @@ const inputSpec = InputSpec.of({
     patterns: [
       {
         regex: '^[^\\s,]+$',
-        description: 'No spaces or commas.',
+        description: i18n('No spaces or commas.'),
       },
       {
         regex: '^(?!https?://)(?!ftp://)(?!www\\.).*$',
-        description: 'Cannot look like a URL.',
+        description: i18n('Cannot look like a URL.'),
       },
       {
         regex: '^(?!link-share-\\d+$).*$',
-        description: '"link-share-<number>" is reserved.',
+        description: i18n('"link-share-<number>" is reserved.'),
       },
     ],
   }),
@@ -42,7 +42,7 @@ const inputSpec = InputSpec.of({
     patterns: [
       {
         regex: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
-        description: 'Must be a valid email address.',
+        description: i18n('Must be a valid email address.'),
       },
     ],
   }),
@@ -73,7 +73,7 @@ export const createInitialUser = sdk.Action.withInput(
       ),
       warning: null,
       allowedStatuses: 'any',
-      group: 'Accounts (User mgmt)',
+      group: i18n('Accounts'),
       visibility: done ? 'hidden' : 'enabled',
     }
   },
@@ -125,11 +125,6 @@ export const createInitialUser = sdk.Action.withInput(
       initialUserCreated: true,
       enableRegistration: false,
     })
-
-    // Explicitly clear the install task — tasksOnInstall only fires on
-    // install/restore, so without this clear the critical task would
-    // linger in the UI after the user successfully creates their account.
-    await sdk.action.clearTask(effects, 'vikunja:create-initial-user')
 
     return {
       version: '1',

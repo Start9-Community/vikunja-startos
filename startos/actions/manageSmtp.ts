@@ -50,7 +50,7 @@ export const manageSmtp = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Email',
+    group: i18n('Email'),
     visibility: 'enabled',
   },
 

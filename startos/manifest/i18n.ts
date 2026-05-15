@@ -1,13 +1,9 @@
 export const short = {
   en_US: 'Self-hosted to-do list, project, and team task manager',
-  es_ES:
-    'Gestor de tareas, proyectos y equipos autoalojado',
-  de_DE:
-    'Selbstgehostete Aufgaben-, Projekt- und Teamverwaltung',
-  pl_PL:
-    'Samohostowany menedżer zadań, projektów i zespołów',
-  fr_FR:
-    'Gestionnaire de tâches, projets et équipes auto-hébergé',
+  es_ES: 'Gestor de tareas, proyectos y equipos autoalojado',
+  de_DE: 'Selbstgehostete Aufgaben-, Projekt- und Teamverwaltung',
+  pl_PL: 'Samohostowany menedżer zadań, projektów i zespołów',
+  fr_FR: 'Gestionnaire de tâches, projets et équipes auto-hébergé',
 }
 
 export const long = {

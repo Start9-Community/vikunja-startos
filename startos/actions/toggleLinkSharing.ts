@@ -6,9 +6,7 @@ export const toggleLinkSharing = sdk.Action.withoutInput(
   'toggle-link-sharing',
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableLinkSharing)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableLinkSharing).const(effects)
     return {
       name: on ? i18n('Disable Link Sharing') : i18n('Enable Link Sharing'),
       description: on
@@ -24,15 +22,13 @@ export const toggleLinkSharing = sdk.Action.withoutInput(
             'Anyone with a shared link can read all tasks and attachments on the shared project. Do not enable this if any project contains sensitive data.',
           ),
       allowedStatuses: 'any',
-      group: 'Other',
+      group: i18n('Other'),
       visibility: 'enabled',
     }
   },
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableLinkSharing)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableLinkSharing).const(effects)
     await storeJson.merge(effects, { enableLinkSharing: !on })
   },
 )

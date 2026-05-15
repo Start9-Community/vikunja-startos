@@ -1,6 +1,8 @@
 import { FileHelper, smtpShape, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
+export const defaultMaxAttachmentSize = '20MB'
+
 const smtpAdvancedShape = z
   .object({
     skipTlsVerify: z.boolean().catch(false),
@@ -21,10 +23,10 @@ const shape = z.object({
   enableLinkSharing: z.boolean().catch(false),
   enableEmailReminders: z.boolean().catch(false),
 
-  maxAttachmentSize: z.string().catch('20MB'),
+  maxAttachmentSize: z.string().catch(defaultMaxAttachmentSize),
 })
 
 export const storeJson = FileHelper.json(
-  { base: sdk.volumes.main, subpath: './startos-store.json' },
+  { base: sdk.volumes.main, subpath: './store.json' },
   shape,
 )

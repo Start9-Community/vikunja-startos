@@ -1,4 +1,4 @@
-import { storeJson } from '../fileModels/store.json'
+import { defaultMaxAttachmentSize, storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 
@@ -8,15 +8,15 @@ const inputSpec = InputSpec.of({
   size: Value.text({
     name: i18n('Maximum Attachment Size'),
     description: i18n(
-      'Maximum upload size for task attachments, as a human-readable string (e.g. 20MB, 200MB, 2GB). Vikunja defaults to 20MB.',
+      'Maximum upload size for task attachments, as a human-readable string (e.g. 20MB, 200MB, 2GB).',
     ),
     required: true,
-    default: '20MB',
-    placeholder: '20MB',
+    default: defaultMaxAttachmentSize,
+    placeholder: defaultMaxAttachmentSize,
     patterns: [
       {
         regex: '^[0-9]+(?:\\.[0-9]+)?\\s*(?:[KMGT]i?B|B)?$',
-        description: 'Enter a size like 20MB, 500MB, or 2GB.',
+        description: i18n('Enter a size like 20MB, 500MB, or 2GB.'),
       },
     ],
   }),
@@ -32,7 +32,7 @@ export const maxAttachmentSize = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Other',
+    group: i18n('Other'),
     visibility: 'enabled',
   },
 
@@ -40,7 +40,8 @@ export const maxAttachmentSize = sdk.Action.withInput(
 
   async ({ effects }) => ({
     size:
-      (await storeJson.read((s) => s.maxAttachmentSize).once()) || '20MB',
+      (await storeJson.read((s) => s.maxAttachmentSize).once()) ||
+      defaultMaxAttachmentSize,
   }),
 
   async ({ effects, input }) =>

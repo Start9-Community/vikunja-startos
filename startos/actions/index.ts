@@ -15,19 +15,19 @@ import { userList } from './userList'
 import { userResetPassword } from './userResetPassword'
 
 export const actions = sdk.Actions.of()
-  // === Accounts ===
+  // Group: Accounts
   .addAction(createInitialUser)
   .addAction(userCreate)
   .addAction(userList)
-  .addAction(userDelete)
   .addAction(userResetPassword)
+  .addAction(userDelete)
   .addAction(toggleRegistration)
   .addAction(toggleUserDeletion)
-  // === Email ===
+  // Group: Email
   .addAction(manageSmtp)
-  .addAction(toggleEmailReminders)
   .addAction(testmail)
-  // === Other ===
+  .addAction(toggleEmailReminders)
+  // Group: Other
   .addAction(setPrimaryUrl)
   .addAction(toggleLinkSharing)
   .addAction(maxAttachmentSize)

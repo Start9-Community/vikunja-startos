@@ -9,10 +9,6 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://github.com/go-vikunja/vikunja',
   marketingUrl: 'https://vikunja.io/',
   donationUrl: 'https://opencollective.com/vikunja',
-  docsUrls: [
-    'https://vikunja.io/docs/',
-    'https://vikunja.io/docs/config-options/',
-  ],
   description: { short, long },
   volumes: ['main'],
   images: {

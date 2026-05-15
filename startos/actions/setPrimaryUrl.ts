@@ -32,7 +32,7 @@ export const setPrimaryUrl = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Other',
+    group: i18n('Other'),
     visibility: 'enabled',
   },
 

@@ -6,9 +6,7 @@ export const toggleUserDeletion = sdk.Action.withoutInput(
   'toggle-user-deletion',
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableUserDeletion)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableUserDeletion).const(effects)
     return {
       name: on
         ? i18n('Disable Self-Service User Deletion')
@@ -22,15 +20,13 @@ export const toggleUserDeletion = sdk.Action.withoutInput(
           ),
       warning: null,
       allowedStatuses: 'any',
-      group: 'Accounts (User mgmt)',
+      group: i18n('Accounts'),
       visibility: 'enabled',
     }
   },
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableUserDeletion)
-      .const(effects)
+    const on = await storeJson.read((s) => s.enableUserDeletion).const(effects)
     await storeJson.merge(effects, { enableUserDeletion: !on })
   },
 )

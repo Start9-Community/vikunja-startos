@@ -9,19 +9,22 @@ import {
 } from '../utils'
 
 /**
+ * Create the on-disk layout under /data and chown it for the vikunja user.
+ *
  * Create /data/db and /data/files subdirectories and chown the whole /data
  * to 1000:1000 so the vikunja process (which runs as UID 1000 from the
  * FROM scratch upstream image) can read and write them.
  *
- * Pitfall #3: this MUST run at init time — a critical install task gates
- * the first user-facing action, which fires before the daemon ever starts.
- * If chown were only a daemon-chain oneshot, the critical task would never
- * be reachable because Vikunja can't write to an unwriteable /data.
+ * This MUST run at init time — the critical "Create Your First Vikunja
+ * User" task gates the user-facing flow, which fires before the daemon
+ * ever starts. If chown were only a daemon-chain oneshot, the critical
+ * task would never be reachable because Vikunja can't write to an
+ * unwriteable /data.
  *
- * Pitfall #2: we mount the volume root (subpath: null) rather than
- * `subpath: 'db'` etc., because StartOS auto-creates those host dirs as
- * UID 0, which we can't chown from inside a user-namespace subcontainer.
- * Mount root, steer Vikunja's paths into subdirs via VIKUNJA_*_PATH env.
+ * We mount the volume root (subpath: null) rather than `subpath: 'db'` etc.,
+ * because StartOS auto-creates those host dirs as UID 0, which we can't
+ * chown from inside a user-namespace subcontainer. Mount root, steer
+ * Vikunja's paths into subdirs via VIKUNJA_*_PATH env.
  *
  * Idempotent: mkdir -p and chown -R are safe to repeat on every init.
  */

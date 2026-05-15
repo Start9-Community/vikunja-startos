@@ -35,7 +35,7 @@ export const userDelete = sdk.Action.withInput(
       'This is immediate and irreversible. The user will not receive a confirmation email.',
     ),
     allowedStatuses: 'only-running',
-    group: 'Accounts (User mgmt)',
+    group: i18n('Accounts'),
     visibility: 'enabled',
   },
 
@@ -70,7 +70,9 @@ export const userDelete = sdk.Action.withInput(
           /no user/i.test(stderr) ||
           /could not get user/i.test(stderr)
         ) {
-          throw new Error(i18n('No user matches "${user}".', { user: input.user }))
+          throw new Error(
+            i18n('No user matches "${user}".', { user: input.user }),
+          )
         }
         throw new Error(
           i18n('Vikunja could not delete the user: ${stderr}', { stderr }),

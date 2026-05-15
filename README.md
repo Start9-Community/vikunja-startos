@@ -63,7 +63,7 @@ Layout inside the volume:
 ├── db/
 │   └── vikunja.db        # SQLite database (VIKUNJA_DATABASE_PATH)
 ├── files/                # Task attachments (VIKUNJA_FILES_BASEPATH)
-└── startos-store.json    # StartOS package state (JWT secret, primary URL, toggles, SMTP)
+└── store.json            # StartOS package state (JWT secret, primary URL, toggles, SMTP)
 ```
 
 The volume root is mounted at `/data` so Vikunja can chown the entire subtree. Mounting `subpath: 'db'` directly does not work for scratch images — those host directories would be owned by UID 0 and could not be chown'd from inside the user-namespace subcontainer.
@@ -77,7 +77,7 @@ After install, two tasks appear on the Vikunja service page:
 1. **Critical — Create Your First Vikunja User.** Public registration is disabled by default, so this action is the only way to create the initial account. It accepts username, email, and password (Vikunja's own validation rules), runs `vikunja user create` inside a temporary subcontainer, and returns the credentials. The action hides itself after success.
 2. **Important — Set Primary URL.** StartOS auto-seeds a `.local` URL so the service can come up immediately, but this task asks you to confirm it (or pick `.onion` / a custom domain) before sharing the URL with users.
 
-A persistent JWT secret is generated once at install time and stored in `startos-store.json`, so container restarts and updates do not log everyone out.
+A persistent JWT secret is generated once at install time and stored in `store.json`, so container restarts and updates do not log everyone out.
 
 Once the first user exists, log in at `https://<primary-url>/`.
 
@@ -101,7 +101,7 @@ Once the first user exists, log in at `https://<primary-url>/`.
 
 All Vikunja configuration is plumbed via environment variables (`VIKUNJA_<SECTION>_<KEY>`) — there is no on-disk `config.yml`. The single source of truth for the env block is `getVikunjaEnv()` in `startos/utils.ts`. The same env is passed to the long-lived daemon AND every temp CLI subcontainer.
 
-Mutable settings persist in `startos-store.json` on the `main` volume:
+Mutable settings persist in `store.json` on the `main` volume:
 
 | Field                  | Default                                          | Mutated by                          |
 | ---------------------- | ------------------------------------------------ | ----------------------------------- |
@@ -134,17 +134,17 @@ CalDAV is reachable through the same web interface at `/dav/...` (`VIKUNJA_SERVI
 
 ## Actions
 
-Three groups appear in the StartOS UI (sorted alphabetically): **Accounts (User mgmt)**, **Email**, **Other**. Names below match the literal `i18n('...')` strings in the action source.
+Three groups appear in the StartOS UI (sorted alphabetically): **Accounts**, **Email**, **Other**. Names below match the literal `i18n('...')` strings in the action source.
 
-### Accounts (User mgmt)
+### Accounts
 
 | Display name                                                              | Action ID               | Availability   | Notes                                                                                            |
 | ------------------------------------------------------------------------- | ----------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
 | Create Your First Vikunja User                                            | `create-initial-user`   | any            | Critical install task. Auto-hides after the first user exists (`initialUserCreated` flag).       |
 | Create User                                                               | `user-create`           | any            | Create additional users while public registration is disabled.                                   |
 | List Users                                                                | `user-list`             | any            | Parses Vikunja's `user list` table into per-user accordions; raw table available for copy.       |
-| Delete User                                                               | `user-delete`           | only running   | `vikunja user delete --now`. Immediate, irreversible. Requires explicit confirm checkbox.        |
 | Reset User Password                                                       | `user-reset-password`   | only running   | `vikunja user reset-password --direct`. Auto-generates a strong password if the field is blank.  |
+| Delete User                                                               | `user-delete`           | only running   | `vikunja user delete --now`. Immediate, irreversible. Requires explicit confirm checkbox.        |
 | Enable Registration / Disable Registration                                | `toggle-registration`   | any            | Dynamic label. Default disabled.                                                                 |
 | Enable Self-Service User Deletion / Disable Self-Service User Deletion    | `toggle-user-deletion`  | any            | Dynamic label. Default enabled.                                                                  |
 
@@ -153,8 +153,8 @@ Three groups appear in the StartOS UI (sorted alphabetically): **Accounts (User 
 | Display name                                       | Action ID                | Availability | Notes                                                                                            |
 | -------------------------------------------------- | ------------------------ | ------------ | ------------------------------------------------------------------------------------------------ |
 | Configure SMTP                                     | `manage-smtp`            | any          | Disabled / system / custom selector — visually mirrors `/system/email`. Advanced fields nested.  |
-| Enable Email Reminders / Disable Email Reminders   | `toggle-email-reminders` | any          | Dynamic label. Default disabled. Warns if SMTP is not configured when enabling.                  |
 | Send Test Email                                    | `testmail`               | any          | `vikunja testmail`. Takes a recipient address and confirms delivery via the configured SMTP.     |
+| Enable Email Reminders / Disable Email Reminders   | `toggle-email-reminders` | any          | Dynamic label. Default disabled. Warns if SMTP is not configured when enabling.                  |
 
 ### Other
 
@@ -171,9 +171,9 @@ Every action that shells into Vikunja runs in a temporary subcontainer with `/et
 
 ## Backups and Restore
 
-`sdk.Backups.ofVolumes('main')` snapshots the entire `main` volume — that covers the SQLite database, every uploaded attachment, and `startos-store.json` (JWT secret, primary URL, toggles, SMTP).
+`sdk.Backups.ofVolumes('main')` snapshots the entire `main` volume — that covers the SQLite database, every uploaded attachment, and `store.json` (JWT secret, primary URL, toggles, SMTP).
 
-Restore re-runs the standard init chain: `seedFiles → initVolumeLayout → ensureSecret` (no-op when a secret is already in the restored store) `→ tasksOnInstall` (skipped on restore) `→ setupPrimaryUrl → watchSystemSmtp`. No restore-specific migrations.
+Restore re-runs the standard init chain: `seedFiles → initVolumeLayout → ensureSecret` (no-op when a secret is already in the restored store) `→ watchInitialUser → setupPrimaryUrl`. No restore-specific migrations.
 
 ---
 

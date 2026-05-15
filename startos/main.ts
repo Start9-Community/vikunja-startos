@@ -1,11 +1,6 @@
 import { i18n } from './i18n'
 import { sdk } from './sdk'
-import {
-  dataMount,
-  getVikunjaEnv,
-  plantPasswd,
-  uiPort,
-} from './utils'
+import { dataMount, getVikunjaEnv, plantPasswd, uiPort } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info(i18n('Starting Vikunja!'))

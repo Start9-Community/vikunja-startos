@@ -17,7 +17,7 @@ const inputSpec = InputSpec.of({
     patterns: [
       {
         regex: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
-        description: 'Must be a valid email address.',
+        description: i18n('Must be a valid email address.'),
       },
     ],
   }),
@@ -40,7 +40,7 @@ export const testmail = sdk.Action.withInput(
           ? i18n('SMTP is disabled. Configure SMTP before running this action.')
           : null,
       allowedStatuses: 'any',
-      group: 'Email',
+      group: i18n('Email'),
       visibility: 'enabled',
     }
   },
@@ -59,25 +59,21 @@ export const testmail = sdk.Action.withInput(
       )
     }
 
-    await withVikunjaCli(
-      effects,
-      'vikunja-testmail',
-      async (sub, env) => {
-        const res = await sub.exec(
-          ['/app/vikunja/vikunja', 'testmail', input.to],
-          { env, user: 'vikunja' },
+    await withVikunjaCli(effects, 'vikunja-testmail', async (sub, env) => {
+      const res = await sub.exec(
+        ['/app/vikunja/vikunja', 'testmail', input.to],
+        { env, user: 'vikunja' },
+      )
+      if (res.exitCode !== 0) {
+        const err = res.stderr.toString().trim()
+        const out = res.stdout.toString().trim()
+        throw new Error(
+          i18n('Vikunja could not send the test email: ${stderr}', {
+            stderr: err || out,
+          }),
         )
-        if (res.exitCode !== 0) {
-          const err = res.stderr.toString().trim()
-          const out = res.stdout.toString().trim()
-          throw new Error(
-            i18n('Vikunja could not send the test email: ${stderr}', {
-              stderr: err || out,
-            }),
-          )
-        }
-      },
-    )
+      }
+    })
 
     return {
       version: '1' as const,

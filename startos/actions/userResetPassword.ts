@@ -38,7 +38,7 @@ export const userResetPassword = sdk.Action.withInput(
     ),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Accounts (User mgmt)',
+    group: i18n('Accounts'),
     visibility: 'enabled',
   },
 
