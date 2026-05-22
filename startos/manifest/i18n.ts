@@ -21,15 +21,15 @@ export const long = {
 
 export const alertInstall = {
   en_US:
-    'Public registration is disabled by default. After install, open the critical task "Create Your First Vikunja User" to create your admin account — it is the only way to log in. You should also confirm the primary URL.',
+    'Public registration is disabled by default. After install, open the critical "Create User" task to create your admin account — it is the only way to log in. Vikunja generates the password for you. You should also confirm the primary URL.',
   es_ES:
-    'El registro público está deshabilitado por defecto. Tras la instalación, abra la tarea crítica "Cree su primer usuario de Vikunja" para crear su cuenta de administrador — es la única forma de iniciar sesión. También debe confirmar la URL principal.',
+    'El registro público está deshabilitado por defecto. Tras la instalación, abra la tarea crítica "Crear usuario" para crear su cuenta de administrador — es la única forma de iniciar sesión. Vikunja genera la contraseña por usted. También debe confirmar la URL principal.',
   de_DE:
-    'Die öffentliche Registrierung ist standardmäßig deaktiviert. Öffnen Sie nach der Installation die kritische Aufgabe "Ersten Vikunja-Benutzer erstellen", um Ihr Admin-Konto anzulegen — das ist der einzige Weg zur Anmeldung. Bestätigen Sie außerdem die primäre URL.',
+    'Die öffentliche Registrierung ist standardmäßig deaktiviert. Öffnen Sie nach der Installation die kritische Aufgabe "Benutzer erstellen", um Ihr Admin-Konto anzulegen — das ist der einzige Weg zur Anmeldung. Vikunja generiert das Passwort für Sie. Bestätigen Sie außerdem die primäre URL.',
   pl_PL:
-    'Publiczna rejestracja jest domyślnie wyłączona. Po instalacji otwórz zadanie krytyczne "Utwórz pierwszego użytkownika Vikunja", aby utworzyć konto administratora — to jedyny sposób, aby się zalogować. Potwierdź również główny adres URL.',
+    'Publiczna rejestracja jest domyślnie wyłączona. Po instalacji otwórz zadanie krytyczne "Utwórz użytkownika", aby utworzyć konto administratora — to jedyny sposób, aby się zalogować. Vikunja wygeneruje dla Ciebie hasło. Potwierdź również główny adres URL.',
   fr_FR:
-    "L'inscription publique est désactivée par défaut. Après l'installation, ouvrez la tâche critique « Créez votre premier utilisateur Vikunja » pour créer votre compte administrateur — c'est la seule façon de vous connecter. Vous devez également confirmer l'URL principale.",
+    "L'inscription publique est désactivée par défaut. Après l'installation, ouvrez la tâche critique « Créer un utilisateur » pour créer votre compte administrateur — c'est la seule façon de vous connecter. Vikunja génère le mot de passe pour vous. Vous devez également confirmer l'URL principale.",
 }
 
 export const alertUninstall = {

@@ -1,11 +1,37 @@
+import { T } from '@start9labs/start-sdk'
+import { storeJson } from './fileModels/store.json'
 import { i18n } from './i18n'
 import { sdk } from './sdk'
-import { dataMount, getVikunjaEnv, plantPasswd, uiPort } from './utils'
+import {
+  customCredentials,
+  dataMount,
+  getVikunjaEnv,
+  mailerEnv,
+  plantPasswd,
+  uiPort,
+} from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info(i18n('Starting Vikunja!'))
 
-  const env = await getVikunjaEnv(effects)
+  const store = await storeJson.read().const(effects)
+  const smtp = store?.smtp
+  let creds: T.SmtpValue | null = null
+  if (smtp?.selection === 'system') {
+    const sys = await sdk.getSystemSmtp(effects).const()
+    const customFrom = smtp.value.customFrom as string | undefined
+    creds = sys && customFrom ? { ...sys, from: customFrom } : sys
+  } else if (smtp?.selection === 'custom') {
+    creds = customCredentials(smtp.value.provider.value)
+  }
+
+  const env = getVikunjaEnv(
+    store,
+    mailerEnv(
+      creds,
+      store?.smtpAdvanced ?? { skipTlsVerify: false, authType: 'plain' },
+    ),
+  )
 
   if (!env.VIKUNJA_SERVICE_SECRET) {
     throw new Error(

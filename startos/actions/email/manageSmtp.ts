@@ -1,7 +1,7 @@
 import { smtpPrefill } from '@start9labs/start-sdk'
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 const { InputSpec, Value } = sdk
 

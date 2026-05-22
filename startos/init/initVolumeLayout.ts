@@ -15,10 +15,10 @@ import {
  * to 1000:1000 so the vikunja process (which runs as UID 1000 from the
  * FROM scratch upstream image) can read and write them.
  *
- * This MUST run at init time — the critical "Create Your First Vikunja
- * User" task gates the user-facing flow, which fires before the daemon
- * ever starts. If chown were only a daemon-chain oneshot, the critical
- * task would never be reachable because Vikunja can't write to an
+ * This MUST run at init time — the critical "Create User" task gates the
+ * user-facing flow, which fires before the daemon ever starts. If chown
+ * were only a daemon-chain oneshot, the critical task would never be
+ * reachable because Vikunja can't write to an
  * unwriteable /data.
  *
  * We mount the volume root (subpath: null) rather than `subpath: 'db'` etc.,

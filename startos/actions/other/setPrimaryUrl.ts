@@ -1,7 +1,7 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { getPrimaryUrls } from '../utils'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { getPrimaryUrls } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -39,9 +39,11 @@ export const setPrimaryUrl = sdk.Action.withInput(
   inputSpec,
 
   async ({ effects }) => ({
-    url: (await storeJson.read((s) => s.primaryUrl).once()) || undefined,
+    url:
+      (await storeJson.read((s) => s.VIKUNJA_SERVICE_PUBLICURL).once()) ||
+      undefined,
   }),
 
   async ({ effects, input }) =>
-    storeJson.merge(effects, { primaryUrl: input.url }),
+    storeJson.merge(effects, { VIKUNJA_SERVICE_PUBLICURL: input.url }),
 )

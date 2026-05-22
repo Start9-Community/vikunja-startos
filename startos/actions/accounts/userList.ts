@@ -1,6 +1,7 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { stripVikunjaLogs, withVikunjaCli } from '../utils'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { getVikunjaEnv, stripVikunjaLogs, withVikunjaCli } from '../../utils'
 
 type ParsedUser = { id: string; username: string; email: string }
 
@@ -44,6 +45,7 @@ export const userList = sdk.Action.withoutInput(
     const raw = await withVikunjaCli(
       effects,
       'vikunja-user-list',
+      getVikunjaEnv(await storeJson.read().once()),
       async (sub, env) => {
         const res = await sub.execFail(
           ['/app/vikunja/vikunja', 'user', 'list'],
@@ -74,15 +76,7 @@ export const userList = sdk.Action.withoutInput(
         version: '1' as const,
         title: i18n('Vikunja Users'),
         message: raw,
-        result: {
-          type: 'single' as const,
-          name: i18n('Raw Output'),
-          description: null,
-          value: raw,
-          masked: false,
-          copyable: true,
-          qr: false,
-        },
+        result: null,
       }
     }
 
@@ -127,15 +121,6 @@ export const userList = sdk.Action.withoutInput(
               },
             ],
           })),
-          {
-            type: 'single' as const,
-            name: i18n('Raw Output'),
-            description: null,
-            value: raw,
-            masked: false,
-            copyable: true,
-            qr: false,
-          },
         ],
       },
     }

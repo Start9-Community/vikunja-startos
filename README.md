@@ -52,30 +52,38 @@ The busybox helper image is invoked once during init to create `/data/db` and `/
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose                                       |
-| ------ | ----------- | --------------------------------------------- |
-| `main` | `/data`     | SQLite database, attachments, package state   |
+| Volume    | Mount Point      | Purpose                                                            |
+| --------- | ---------------- | ------------------------------------------------------------------ |
+| `main`    | `/data`          | Vikunja's own persistent data: SQLite database and attachments     |
+| `startos` | (not mounted in) | StartOS package state — `store.json` (read host-side via FileHelper) |
 
-Layout inside the volume:
+Vikunja's data and StartOS's package state are kept on separate volumes so the
+two never share a tree: `main` mirrors what upstream Vikunja persists (the
+database and the files directory), while `startos` holds only this package's
+bookkeeping. Layout inside the `main` volume:
 
 ```
 /data/
 ├── db/
 │   └── vikunja.db        # SQLite database (VIKUNJA_DATABASE_PATH)
-├── files/                # Task attachments (VIKUNJA_FILES_BASEPATH)
-└── store.json            # StartOS package state (JWT secret, primary URL, toggles, SMTP)
+└── files/                # Task attachments (VIKUNJA_FILES_BASEPATH)
 ```
 
-The volume root is mounted at `/data` so Vikunja can chown the entire subtree. Mounting `subpath: 'db'` directly does not work for scratch images — those host directories would be owned by UID 0 and could not be chown'd from inside the user-namespace subcontainer.
+`store.json` (JWT secret, primary URL, toggles, SMTP) lives on the `startos`
+volume and is read host-side through the SDK's FileHelper — it is never mounted
+into the container.
+
+The `main` volume root is mounted at `/data` so Vikunja can chown the entire subtree. Mounting `subpath: 'db'` directly does not work for scratch images — those host directories would be owned by UID 0 and could not be chown'd from inside the user-namespace subcontainer.
 
 ---
 
 ## Installation and First-Run Flow
 
-After install, two tasks appear on the Vikunja service page:
+After install, one **critical** task appears on the Vikunja service page:
 
-1. **Critical — Create Your First Vikunja User.** Public registration is disabled by default, so this action is the only way to create the initial account. It accepts username, email, and password (Vikunja's own validation rules), runs `vikunja user create` inside a temporary subcontainer, and returns the credentials. The action hides itself after success.
-2. **Important — Set Primary URL.** StartOS auto-seeds a `.local` URL so the service can come up immediately, but this task asks you to confirm it (or pick `.onion` / a custom domain) before sharing the URL with users.
+1. **Create User.** Public registration is disabled by default, so this action is the only way to create the initial account. It accepts a username and email, generates a strong password (never prompts for one), runs `vikunja user create` inside a temporary subcontainer, and returns the credentials. The same action stays available afterward for adding more users; the critical task resolves once the first user exists.
+
+The primary URL is auto-seeded to a `.local` address on install, so the service is reachable immediately — there is no setup task for it. Change it any time with the **Set Primary URL** action (e.g. to a Tor `.onion` or a custom domain); StartOS only re-prompts (with a critical task) if the chosen URL later becomes unreachable.
 
 A persistent JWT secret is generated once at install time and stored in `store.json`, so container restarts and updates do not log everyone out.
 
@@ -99,22 +107,22 @@ Once the first user exists, log in at `https://<primary-url>/`.
 | Time zone (fixed to UTC)                         |                                                   |
 | CalDAV and TOTP toggles (both forced on)         |                                                   |
 
-All Vikunja configuration is plumbed via environment variables (`VIKUNJA_<SECTION>_<KEY>`) — there is no on-disk `config.yml`. The single source of truth for the env block is `getVikunjaEnv()` in `startos/utils.ts`. The same env is passed to the long-lived daemon AND every temp CLI subcontainer.
+All Vikunja configuration is plumbed via environment variables (`VIKUNJA_<SECTION>_<KEY>`) — there is no on-disk `config.yml`. `getVikunjaEnv(store, smtp)` in `startos/utils.ts` builds the env: the stored settings pass straight through, and the caller supplies the `VIKUNJA_MAILER_*` fragment. Only the daemon (`main.ts`) and the **Send Test Email** action send mail, so they resolve SMTP — reading StartOS system SMTP only when the user chose it as the source — and pass the result via `mailerEnv()`. The other CLI commands don't send email, so they pass `{}` and never touch SMTP.
 
-Mutable settings persist in `store.json` on the `main` volume:
+Mutable settings persist in `store.json` on the `startos` volume. Each setting is keyed by the **Vikunja env var it populates**, with the value stored in the exact form the env expects (`'true'`/`'false'`, size strings), so `getVikunjaEnv()` passes them straight through. The exceptions are `initialUserCreated` (internal package state, never an env var) and the SMTP config, which can't be a flat env value — system credentials are read from StartOS at runtime — so it stays structured and resolves to `VIKUNJA_MAILER_*`.
 
-| Field                  | Default                                          | Mutated by                          |
-| ---------------------- | ------------------------------------------------ | ----------------------------------- |
-| `jwtSecret`            | generated on install                             | (internal — never overwritten)      |
-| `primaryUrl`           | auto-seeded `.local` URL                         | Set Primary URL                     |
-| `initialUserCreated`   | `false`                                          | Create Your First Vikunja User      |
-| `smtp`                 | `{ selection: 'disabled' }`                      | Configure SMTP                      |
-| `smtpAdvanced`         | `{ skipTlsVerify: false, authType: 'plain' }`    | Configure SMTP (Advanced group)     |
-| `enableRegistration`   | `false`                                          | Enable / Disable Registration       |
-| `enableUserDeletion`   | `true`                                           | Enable / Disable Self-Service User Deletion |
-| `enableLinkSharing`    | `false`                                          | Enable / Disable Link Sharing       |
-| `enableEmailReminders` | `false`                                          | Enable / Disable Email Reminders    |
-| `maxAttachmentSize`    | `'20MB'`                                         | Set Max Attachment Size             |
+| Key                                    | Default                                       | Mutated by                                  |
+| -------------------------------------- | --------------------------------------------- | ------------------------------------------- |
+| `initialUserCreated`                   | `false`                                       | Create User                                 |
+| `VIKUNJA_SERVICE_SECRET`               | generated on install                          | (internal — never overwritten)              |
+| `VIKUNJA_SERVICE_PUBLICURL`            | auto-seeded `.local` URL                      | Set Primary URL                             |
+| `VIKUNJA_SERVICE_ENABLEREGISTRATION`   | `'false'`                                     | Enable / Disable Registration               |
+| `VIKUNJA_SERVICE_ENABLEUSERDELETION`   | `'true'`                                      | Enable / Disable Self-Service User Deletion |
+| `VIKUNJA_SERVICE_ENABLELINKSHARING`    | `'false'`                                     | Enable / Disable Link Sharing               |
+| `VIKUNJA_SERVICE_ENABLEEMAILREMINDERS` | `'false'`                                     | Enable / Disable Email Reminders            |
+| `VIKUNJA_FILES_MAXSIZE`                | `'20MB'`                                       | Set Max Attachment Size                     |
+| `smtp`                                 | `{ selection: 'disabled' }`                   | Configure SMTP                              |
+| `smtpAdvanced`                         | `{ skipTlsVerify: false, authType: 'plain' }` | Configure SMTP (Advanced group)             |
 
 A change to any of these triggers a daemon restart so the new env takes effect.
 
@@ -140,11 +148,10 @@ Three groups appear in the StartOS UI (sorted alphabetically): **Accounts**, **E
 
 | Display name                                                              | Action ID               | Availability   | Notes                                                                                            |
 | ------------------------------------------------------------------------- | ----------------------- | -------------- | ------------------------------------------------------------------------------------------------ |
-| Create Your First Vikunja User                                            | `create-initial-user`   | any            | Critical install task. Auto-hides after the first user exists (`initialUserCreated` flag).       |
-| Create User                                                               | `user-create`           | any            | Create additional users while public registration is disabled.                                   |
-| List Users                                                                | `user-list`             | any            | Parses Vikunja's `user list` table into per-user accordions; raw table available for copy.       |
-| Reset User Password                                                       | `user-reset-password`   | only running   | `vikunja user reset-password --direct`. Auto-generates a strong password if the field is blank.  |
-| Delete User                                                               | `user-delete`           | only running   | `vikunja user delete --now`. Immediate, irreversible. Requires explicit confirm checkbox.        |
+| Create User                                                               | `user-create`           | any            | Username + email only — generates and returns a strong password (never prompts). Surfaced as the critical install task until the first user exists (`initialUserCreated` flag); stays available for additional users. |
+| List Users                                                                | `user-list`             | any            | Parses Vikunja's `user list` table into per-user accordions (ID, username, email).               |
+| Reset User Password                                                       | `user-reset-password`   | only running   | `vikunja user reset-password --direct`. Generates and returns a strong password (never prompts). For lockout recovery. |
+| Delete User                                                               | `user-delete`           | only running   | `vikunja user delete --now`. Immediate and irreversible (action `warning` is the confirmation).  |
 | Enable Registration / Disable Registration                                | `toggle-registration`   | any            | Dynamic label. Default disabled.                                                                 |
 | Enable Self-Service User Deletion / Disable Self-Service User Deletion    | `toggle-user-deletion`  | any            | Dynamic label. Default enabled.                                                                  |
 
@@ -160,7 +167,7 @@ Three groups appear in the StartOS UI (sorted alphabetically): **Accounts**, **E
 
 | Display name                                | Action ID              | Availability | Notes                                                                              |
 | ------------------------------------------- | ---------------------- | ------------ | ---------------------------------------------------------------------------------- |
-| Set Primary URL                             | `set-primary-url`      | any          | Important install task. Reactive — the daemon restarts when the primary URL changes. |
+| Set Primary URL                             | `set-primary-url`      | any          | Change the primary URL (`.local` is auto-seeded on install — no setup task). Reactive: the daemon restarts when it changes. |
 | Enable Link Sharing / Disable Link Sharing  | `toggle-link-sharing`  | any          | Dynamic label. Default disabled. Warns about exposure when enabling.               |
 | Set Max Attachment Size                     | `max-attachment-size`  | any          | Change `VIKUNJA_FILES_MAXSIZE` (string format like `20MB`, `200MB`, `2GB`).        |
 | Run Diagnostics                             | `doctor`               | any          | `vikunja doctor` output for troubleshooting install or startup issues.             |
@@ -171,7 +178,7 @@ Every action that shells into Vikunja runs in a temporary subcontainer with `/et
 
 ## Backups and Restore
 
-`sdk.Backups.ofVolumes('main')` snapshots the entire `main` volume — that covers the SQLite database, every uploaded attachment, and `store.json` (JWT secret, primary URL, toggles, SMTP).
+`sdk.Backups.ofVolumes('main', 'startos')` snapshots both volumes — the `main` volume (SQLite database and every uploaded attachment) and the `startos` volume (`store.json`: JWT secret, primary URL, toggles, SMTP). SQLite's `-wal`, `-shm`, and `-journal` sidecar files are excluded, since capturing them mid-write could restore an inconsistent database.
 
 Restore re-runs the standard init chain: `seedFiles → initVolumeLayout → ensureSecret` (no-op when a secret is already in the restored store) `→ watchInitialUser → setupPrimaryUrl`. No restore-specific migrations.
 
@@ -196,7 +203,7 @@ Vikunja runs SQLite migrations on startup; the grace period accounts for migrati
 ## Limitations and Differences from Upstream
 
 1. **No riscv64.** The upstream Docker image is published for `amd64` and `arm64` only.
-2. **SQLite only.** PostgreSQL and MySQL/MariaDB backends are not exposed. SQLite fits the home-server / small-team use case StartOS targets.
+2. **SQLite only.** PostgreSQL and MySQL/MariaDB backends are not exposed. Upstream recommends Postgres for instances with more than a handful of users and treats SQLite as the lighter option; we ship SQLite deliberately, because it fits the single-user / small-team home-server use case StartOS targets — one fewer daemon, and a backup/restore that is just a file copy.
 3. **Public registration is disabled by default.** Upstream defaults to `enableregistration: true`; we override to `false`. Re-enable via the **Enable Registration** action if needed.
 4. **Public link sharing is disabled by default.** Upstream defaults to `enablelinksharing: true`; we override to `false` because attachments on a shared project would otherwise be readable by anyone with the link.
 5. **Email reminders are disabled by default.** Upstream defaults to `true`; without SMTP they would silently no-op, so we default off and warn if reminders are enabled before SMTP is configured.
@@ -236,7 +243,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and contribution g
 package_id: vikunja
 architectures: [x86_64, aarch64]
 volumes:
-  main: /data
+  main: /data            # SQLite database + attachments
+  startos: (not mounted) # store.json package state
 ports:
   webui: 3456
 dependencies: none
@@ -266,7 +274,6 @@ startos_managed_env_vars:
   - VIKUNJA_MAILER_SKIPTLSVERIFY
   - VIKUNJA_MAILER_AUTHTYPE
 actions:
-  - create-initial-user
   - user-create
   - user-list
   - user-delete
@@ -283,8 +290,8 @@ actions:
 ```
 
 Maintainer pointers:
-- All env vars live in `getVikunjaEnv()` (`startos/utils.ts`).
-- All actions register through `startos/actions/index.ts`.
+- Env vars are built in `getVikunjaEnv(store, smtp)`; the mailer fragment comes from `mailerEnv()`, which only the daemon and Send Test Email build — all in `startos/utils.ts`.
+- All actions register through `startos/actions/index.ts`; the action files themselves are grouped into `accounts/`, `email/`, and `other/` subfolders matching their UI group.
 - All init steps register through `startos/init/index.ts`.
 - All locale strings live in `startos/i18n/dictionaries/default.ts` and `translations.ts`.
-- Pitfalls (scratch image, USER 1000, volume layout, JWT secret) are documented in `CLAUDE.md`.
+- Pitfalls (scratch image, USER 1000, volume layout, JWT secret) are documented inline where they bite: `startos/utils.ts` (passwd plant, shared env), `startos/init/initVolumeLayout.ts` (volume root mount + chown), and `startos/init/ensureSecret.ts` (persistent JWT secret).

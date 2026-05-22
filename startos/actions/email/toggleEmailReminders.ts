@@ -1,6 +1,6 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 export const toggleEmailReminders = sdk.Action.withoutInput(
   'toggle-email-reminders',
@@ -8,12 +8,12 @@ export const toggleEmailReminders = sdk.Action.withoutInput(
   async ({ effects }) => {
     const state = await storeJson
       .read((s) => ({
-        on: s.enableEmailReminders,
+        on: s.VIKUNJA_SERVICE_ENABLEEMAILREMINDERS,
         smtp: s.smtp?.selection ?? 'disabled',
       }))
       .const(effects)
 
-    const on = state?.on ?? false
+    const on = (state?.on ?? 'false') === 'true'
     const smtpDisabled = (state?.smtp ?? 'disabled') === 'disabled'
 
     return {
@@ -40,9 +40,12 @@ export const toggleEmailReminders = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
-    const on = await storeJson
-      .read((s) => s.enableEmailReminders)
-      .const(effects)
-    await storeJson.merge(effects, { enableEmailReminders: !on })
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLEEMAILREMINDERS)
+        .const(effects)) === 'true'
+    await storeJson.merge(effects, {
+      VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: on ? 'false' : 'true',
+    })
   },
 )

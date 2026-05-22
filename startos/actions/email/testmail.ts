@@ -1,7 +1,13 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { withVikunjaCli } from '../utils'
+import { T } from '@start9labs/start-sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import {
+  customCredentials,
+  getVikunjaEnv,
+  mailerEnv,
+  withVikunjaCli,
+} from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -50,16 +56,36 @@ export const testmail = sdk.Action.withInput(
   async () => ({}),
 
   async ({ effects, input }) => {
-    const sel = await storeJson
-      .read((s) => s.smtp?.selection ?? 'disabled')
-      .once()
-    if (sel === 'disabled') {
+    // Send Test Email is the one CLI action that sends mail, so it resolves
+    // SMTP itself (one-shot), reading system SMTP only when it is the source.
+    const store = await storeJson.read().once()
+    const smtp = store?.smtp
+    let creds: T.SmtpValue | null = null
+    if (smtp?.selection === 'system') {
+      const sys = await sdk.getSystemSmtp(effects).once()
+      const customFrom = smtp.value.customFrom as string | undefined
+      creds = sys && customFrom ? { ...sys, from: customFrom } : sys
+    } else if (smtp?.selection === 'custom') {
+      creds = customCredentials(smtp.value.provider.value)
+    }
+
+    const env = getVikunjaEnv(
+      store,
+      mailerEnv(
+        creds,
+        store?.smtpAdvanced ?? {
+          skipTlsVerify: false,
+          authType: 'plain',
+        },
+      ),
+    )
+    if (env.VIKUNJA_MAILER_ENABLED !== 'true') {
       throw new Error(
         i18n('SMTP is disabled. Configure SMTP before running this action.'),
       )
     }
 
-    await withVikunjaCli(effects, 'vikunja-testmail', async (sub, env) => {
+    await withVikunjaCli(effects, 'vikunja-testmail', env, async (sub, env) => {
       const res = await sub.exec(
         ['/app/vikunja/vikunja', 'testmail', input.to],
         { env, user: 'vikunja' },

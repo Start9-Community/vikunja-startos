@@ -1,12 +1,15 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 export const toggleUserDeletion = sdk.Action.withoutInput(
   'toggle-user-deletion',
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableUserDeletion).const(effects)
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLEUSERDELETION)
+        .const(effects)) === 'true'
     return {
       name: on
         ? i18n('Disable Self-Service User Deletion')
@@ -26,7 +29,12 @@ export const toggleUserDeletion = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableUserDeletion).const(effects)
-    await storeJson.merge(effects, { enableUserDeletion: !on })
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLEUSERDELETION)
+        .const(effects)) === 'true'
+    await storeJson.merge(effects, {
+      VIKUNJA_SERVICE_ENABLEUSERDELETION: on ? 'false' : 'true',
+    })
   },
 )

@@ -1,7 +1,8 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { withVikunjaCli } from '../utils'
+import { utils } from '@start9labs/start-sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { getVikunjaEnv, withVikunjaCli } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -16,10 +17,7 @@ const inputSpec = InputSpec.of({
     minLength: 3,
     maxLength: 250,
     patterns: [
-      {
-        regex: '^[^\\s,]+$',
-        description: i18n('No spaces or commas.'),
-      },
+      { regex: '^[^\\s,]+$', description: i18n('No spaces or commas.') },
       {
         regex: '^(?!https?://)(?!ftp://)(?!www\\.).*$',
         description: i18n('Cannot look like a URL.'),
@@ -46,36 +44,20 @@ const inputSpec = InputSpec.of({
       },
     ],
   }),
-  password: Value.text({
-    name: i18n('Password'),
-    description: i18n(
-      '8 to 72 bytes. Bcrypt truncates anything beyond 72 bytes; non-ASCII characters count as more than one byte.',
-    ),
-    required: true,
-    default: null,
-    minLength: 8,
-    maxLength: 72,
-    masked: true,
-  }),
 })
 
-export const createInitialUser = sdk.Action.withInput(
-  'create-initial-user',
+export const userCreate = sdk.Action.withInput(
+  'user-create',
 
-  async ({ effects }) => {
-    const done = await storeJson
-      .read((s) => s.initialUserCreated)
-      .const(effects)
-    return {
-      name: i18n('Create Your First Vikunja User'),
-      description: i18n(
-        'Create the initial administrator account. Public registration is disabled by default, so this action is the only way to create the first user.',
-      ),
-      warning: null,
-      allowedStatuses: 'any',
-      group: i18n('Accounts'),
-      visibility: done ? 'hidden' : 'enabled',
-    }
+  {
+    name: i18n('Create User'),
+    description: i18n(
+      'Create a Vikunja user. A strong password is generated and returned below — the user can change it later in Vikunja.',
+    ),
+    warning: null,
+    allowedStatuses: 'any',
+    group: i18n('Accounts'),
+    visibility: 'enabled',
   },
 
   inputSpec,
@@ -83,11 +65,14 @@ export const createInitialUser = sdk.Action.withInput(
   async () => ({}),
 
   async ({ effects, input }) => {
-    const { username, email, password } = input
+    const { username, email } = input
+    // Never ask the user for a password — generate a strong one and return it.
+    const password = utils.getDefaultString({ charset: 'a-z,A-Z,0-9', len: 24 })
 
     await withVikunjaCli(
       effects,
-      'vikunja-create-first-user',
+      'vikunja-user-create',
+      getVikunjaEnv(await storeJson.read().once()),
       async (sub, env) => {
         const res = await sub.exec(
           [
@@ -111,9 +96,6 @@ export const createInitialUser = sdk.Action.withInput(
               i18n('A user with that username or email already exists.'),
             )
           }
-          if (/invalid email/i.test(stderr)) {
-            throw new Error(i18n('The email address is invalid.'))
-          }
           throw new Error(
             i18n('Vikunja could not create the user: ${stderr}', { stderr }),
           )
@@ -121,10 +103,8 @@ export const createInitialUser = sdk.Action.withInput(
       },
     )
 
-    await storeJson.merge(effects, {
-      initialUserCreated: true,
-      enableRegistration: false,
-    })
+    // Resolves the "create your first user" install task once any user exists.
+    await storeJson.merge(effects, { initialUserCreated: true })
 
     return {
       version: '1',

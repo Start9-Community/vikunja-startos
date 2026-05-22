@@ -1,7 +1,8 @@
 import { utils } from '@start9labs/start-sdk'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { withVikunjaCli } from '../utils'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { getVikunjaEnv, withVikunjaCli } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -15,17 +16,6 @@ const inputSpec = InputSpec.of({
     default: null,
     minLength: 1,
   }),
-  newPassword: Value.text({
-    name: i18n('New Password'),
-    description: i18n(
-      'Leave blank to auto-generate a strong random password. 8 to 72 bytes if provided.',
-    ),
-    required: false,
-    default: null,
-    minLength: 8,
-    maxLength: 72,
-    masked: true,
-  }),
 })
 
 export const userResetPassword = sdk.Action.withInput(
@@ -34,7 +24,7 @@ export const userResetPassword = sdk.Action.withInput(
   {
     name: i18n('Reset User Password'),
     description: i18n(
-      "Reset a user's password directly, without sending an email.",
+      'Generate a new password for a user and return it — use this to recover access if a password is lost. No email is sent.',
     ),
     warning: null,
     allowedStatuses: 'only-running',
@@ -47,13 +37,13 @@ export const userResetPassword = sdk.Action.withInput(
   async () => ({}),
 
   async ({ effects, input }) => {
-    const password =
-      input.newPassword ||
-      utils.getDefaultString({ charset: 'a-z,A-Z,0-9', len: 24 })
+    // Never ask for a password — generate a strong one and return it.
+    const password = utils.getDefaultString({ charset: 'a-z,A-Z,0-9', len: 24 })
 
     await withVikunjaCli(
       effects,
       'vikunja-user-reset-password',
+      getVikunjaEnv(await storeJson.read().once()),
       async (sub, env) => {
         const res = await sub.exec(
           [

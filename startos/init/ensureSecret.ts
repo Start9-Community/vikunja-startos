@@ -17,12 +17,12 @@ import { sdk } from '../sdk'
 export const ensureSecret = sdk.setupOnInit(async (effects, kind) => {
   if (kind !== 'install') return
 
-  const existing = await storeJson.read((s) => s.jwtSecret).once()
+  const existing = await storeJson.read((s) => s.VIKUNJA_SERVICE_SECRET).once()
   if (existing) return
 
-  const jwtSecret = utils.getDefaultString({
+  const secret = utils.getDefaultString({
     charset: 'a-z,A-Z,0-9',
     len: 64,
   })
-  await storeJson.merge(effects, { jwtSecret })
+  await storeJson.merge(effects, { VIKUNJA_SERVICE_SECRET: secret })
 })

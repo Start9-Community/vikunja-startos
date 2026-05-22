@@ -1,12 +1,15 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 export const toggleRegistration = sdk.Action.withoutInput(
   'toggle-registration',
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableRegistration).const(effects)
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLEREGISTRATION)
+        .const(effects)) === 'true'
     return {
       name: on ? i18n('Disable Registration') : i18n('Enable Registration'),
       description: on
@@ -28,7 +31,12 @@ export const toggleRegistration = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableRegistration).const(effects)
-    await storeJson.merge(effects, { enableRegistration: !on })
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLEREGISTRATION)
+        .const(effects)) === 'true'
+    await storeJson.merge(effects, {
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: on ? 'false' : 'true',
+    })
   },
 )

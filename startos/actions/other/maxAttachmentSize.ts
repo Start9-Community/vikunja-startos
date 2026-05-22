@@ -1,6 +1,9 @@
-import { defaultMaxAttachmentSize, storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import {
+  defaultMaxAttachmentSize,
+  storeJson,
+} from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 const { InputSpec, Value } = sdk
 
@@ -40,10 +43,10 @@ export const maxAttachmentSize = sdk.Action.withInput(
 
   async ({ effects }) => ({
     size:
-      (await storeJson.read((s) => s.maxAttachmentSize).once()) ||
+      (await storeJson.read((s) => s.VIKUNJA_FILES_MAXSIZE).once()) ||
       defaultMaxAttachmentSize,
   }),
 
   async ({ effects, input }) =>
-    storeJson.merge(effects, { maxAttachmentSize: input.size }),
+    storeJson.merge(effects, { VIKUNJA_FILES_MAXSIZE: input.size }),
 )

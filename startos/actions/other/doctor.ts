@@ -1,6 +1,7 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { stripVikunjaLogs, withVikunjaCli } from '../utils'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { getVikunjaEnv, stripVikunjaLogs, withVikunjaCli } from '../../utils'
 
 export const doctor = sdk.Action.withoutInput(
   'doctor',
@@ -20,6 +21,7 @@ export const doctor = sdk.Action.withoutInput(
     const raw = await withVikunjaCli(
       effects,
       'vikunja-doctor',
+      getVikunjaEnv(await storeJson.read().once()),
       async (sub, env) => {
         const res = await sub.exec(['/app/vikunja/vikunja', 'doctor'], {
           env,

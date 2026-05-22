@@ -1,6 +1,6 @@
 # Vikunja
 
-Public registration is **off** by default. Create your first account using the **Create Your First Vikunja User** critical task that appears immediately after install — open it before doing anything else.
+Public registration is **off** by default. Create your first account using the **Create User** critical task that appears immediately after install — open it before doing anything else. You provide only a username and email; Vikunja generates a strong password and returns it (you can change it later in the app).
 
 ## Documentation
 
@@ -17,8 +17,8 @@ Public registration is **off** by default. Create your first account using the *
 
 ## Getting set up
 
-1. After installing, Vikunja posts two tasks. Open the **critical** task first — **Create Your First Vikunja User**. Provide a username, email, and password. The task disappears once the user exists; save the credentials Vikunja returns.
-2. Open the **important** task — **Set Primary URL**. StartOS auto-selects your `.local` address as Vikunja's primary URL; confirm it, or pick a Tor `.onion` or custom clearnet domain. The primary URL is what Vikunja uses for invitation emails, password-reset links, and CORS allow-list — choose the one you actually intend to share with users.
+1. After installing, Vikunja posts one **critical** task — **Create User**. Open it, provide a username and email; Vikunja generates a strong password and returns it. **Save it** (you can change it in Vikunja later). The task disappears once the first user exists.
+2. Your primary URL is set automatically to your `.local` address, so Vikunja is reachable right away. If you want to use a Tor `.onion` or a custom clearnet domain instead — it's what Vikunja uses for invitation emails, password-reset links, and the CORS allow-list — change it with the **Set Primary URL** action.
 3. If you want Vikunja to send email (password resets, reminders, invites), run **Configure SMTP** under the **Email** group. Pick **System** to reuse StartOS's system SMTP, or **Custom** to enter provider credentials. Confirm with **Send Test Email**.
 4. Open the **Web UI** interface and log in with the credentials from step 1.
 
@@ -34,11 +34,10 @@ The actions are organized into three groups in the StartOS UI:
 
 **Accounts**
 
-- **Create Your First Vikunja User** — the critical install task. Hides itself after the first user is created.
-- **Create User** — add additional users while public registration is disabled.
+- **Create User** — create a Vikunja user. You provide a username and email; Vikunja generates and returns a strong password (change it later in the app if you like). This is the critical install task until the first user exists, and stays available afterward for adding more users.
 - **List Users** — show every Vikunja user with ID, username, and email.
-- **Reset User Password** — set a new password for a user directly, without sending an email. Leave the password field blank to auto-generate a strong one.
-- **Delete User** — immediately and irreversibly delete a user and all of their projects, tasks, and attachments. Requires an explicit confirmation checkbox.
+- **Reset User Password** — generate a new password for a user and return it (no email sent). Use this to recover access if you're locked out.
+- **Delete User** — immediately and irreversibly delete a user and all of their projects, tasks, and attachments. StartOS shows a warning before it runs.
 - **Enable Registration / Disable Registration** — toggle public signups. Default is disabled; enable briefly if you want users to self-register, then disable again.
 - **Enable Self-Service User Deletion / Disable Self-Service User Deletion** — control whether users can delete their own accounts without admin approval. Default is enabled.
 

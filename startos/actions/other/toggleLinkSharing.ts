@@ -1,12 +1,15 @@
-import { storeJson } from '../fileModels/store.json'
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
+import { storeJson } from '../../fileModels/store.json'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
 
 export const toggleLinkSharing = sdk.Action.withoutInput(
   'toggle-link-sharing',
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableLinkSharing).const(effects)
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLELINKSHARING)
+        .const(effects)) === 'true'
     return {
       name: on ? i18n('Disable Link Sharing') : i18n('Enable Link Sharing'),
       description: on
@@ -28,7 +31,12 @@ export const toggleLinkSharing = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
-    const on = await storeJson.read((s) => s.enableLinkSharing).const(effects)
-    await storeJson.merge(effects, { enableLinkSharing: !on })
+    const on =
+      (await storeJson
+        .read((s) => s.VIKUNJA_SERVICE_ENABLELINKSHARING)
+        .const(effects)) === 'true'
+    await storeJson.merge(effects, {
+      VIKUNJA_SERVICE_ENABLELINKSHARING: on ? 'false' : 'true',
+    })
   },
 )
