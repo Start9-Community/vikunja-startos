@@ -7,6 +7,13 @@ import {
 import { sdk } from './sdk'
 
 export const uiPort = 3456 as const
+
+// Host id (the `sdk.MultiHost.of` group) carrying the webui interface —
+// distinct from the interface id exported on it. Used for `sdk.host.getOwn`
+// lookups.
+export const mainHostId = 'main'
+export const webuiInterfaceId = 'webui'
+
 export const DATA_MOUNT = '/data' as const
 export const DB_SUBPATH = 'db' as const
 export const FILES_SUBPATH = 'files' as const
@@ -45,8 +52,15 @@ export async function plantPasswd(sub: {
  * a .local URL on install.
  */
 export async function getPrimaryUrls(effects: T.Effects): Promise<string[]> {
-  return sdk.serviceInterface
-    .getOwn(effects, 'webui', (i) => i?.addressInfo?.nonLocal.format() || [])
+  return sdk.host
+    .getOwn(effects, mainHostId, (host) => {
+      const iface =
+        host &&
+        Object.values(host.bindings)
+          .flatMap((b) => Object.values(b.interfaces))
+          .find((i) => i.id === webuiInterfaceId)
+      return iface ? iface.addressInfo.nonLocal.format() : []
+    })
     .const()
 }
 

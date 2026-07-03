@@ -18,29 +18,3 @@ export const long = {
   fr_FR:
     "Vikunja est un gestionnaire de tâches et de projets open-source auto-hébergeable. C'est un remplacement direct pour Todoist, Asana et Trello, avec la prise en charge des projets, des tâches, des tableaux kanban, des diagrammes de Gantt, des vues tabulaires et de la collaboration en équipe. Les notifications par e-mail, les pièces jointes, les étiquettes, les filtres et CalDAV sont intégrés.",
 }
-
-export const alertInstall = {
-  en_US:
-    'Public registration is disabled by default. After install, open the critical "Create User" task to create your admin account — it is the only way to log in. Vikunja generates the password for you. You should also confirm the primary URL.',
-  es_ES:
-    'El registro público está deshabilitado por defecto. Tras la instalación, abra la tarea crítica "Crear usuario" para crear su cuenta de administrador — es la única forma de iniciar sesión. Vikunja genera la contraseña por usted. También debe confirmar la URL principal.',
-  de_DE:
-    'Die öffentliche Registrierung ist standardmäßig deaktiviert. Öffnen Sie nach der Installation die kritische Aufgabe "Benutzer erstellen", um Ihr Admin-Konto anzulegen — das ist der einzige Weg zur Anmeldung. Vikunja generiert das Passwort für Sie. Bestätigen Sie außerdem die primäre URL.',
-  pl_PL:
-    'Publiczna rejestracja jest domyślnie wyłączona. Po instalacji otwórz zadanie krytyczne "Utwórz użytkownika", aby utworzyć konto administratora — to jedyny sposób, aby się zalogować. Vikunja wygeneruje dla Ciebie hasło. Potwierdź również główny adres URL.',
-  fr_FR:
-    "L'inscription publique est désactivée par défaut. Après l'installation, ouvrez la tâche critique « Créer un utilisateur » pour créer votre compte administrateur — c'est la seule façon de vous connecter. Vikunja génère le mot de passe pour vous. Vous devez également confirmer l'URL principale.",
-}
-
-export const alertUninstall = {
-  en_US:
-    'Uninstalling Vikunja will permanently delete all projects, tasks, users, and attachments. Create a backup first if you want to keep this data.',
-  es_ES:
-    'Desinstalar Vikunja eliminará permanentemente todos los proyectos, tareas, usuarios y adjuntos. Cree primero una copia de seguridad si desea conservar estos datos.',
-  de_DE:
-    'Durch die Deinstallation von Vikunja werden alle Projekte, Aufgaben, Benutzer und Anhänge dauerhaft gelöscht. Erstellen Sie zuerst ein Backup, wenn Sie diese Daten behalten möchten.',
-  pl_PL:
-    'Odinstalowanie Vikunja trwale usunie wszystkie projekty, zadania, użytkowników i załączniki. Najpierw utwórz kopię zapasową, jeśli chcesz zachować te dane.',
-  fr_FR:
-    'La désinstallation de Vikunja supprimera définitivement tous les projets, tâches, utilisateurs et pièces jointes. Créez une sauvegarde si vous souhaitez conserver ces données.',
-}

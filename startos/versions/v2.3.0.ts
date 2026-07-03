@@ -1,13 +1,13 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const v_2_3_0 = VersionInfo.of({
-  version: '2.3.0:0',
+  version: '2.3.0:1',
   releaseNotes: {
-    en_US: 'Initial release of Vikunja for StartOS.',
-    es_ES: 'Lanzamiento inicial de Vikunja para StartOS.',
-    de_DE: 'Erste Veröffentlichung von Vikunja für StartOS.',
-    pl_PL: 'Pierwsze wydanie Vikunja dla StartOS.',
-    fr_FR: 'Version initiale de Vikunja pour StartOS.',
+    en_US: 'Internal updates (start-sdk 2.0.x)',
+    es_ES: 'Actualizaciones internas (start-sdk 2.0.x)',
+    de_DE: 'Interne Aktualisierungen (start-sdk 2.0.x)',
+    pl_PL: 'Aktualizacje wewnętrzne (start-sdk 2.0.x)',
+    fr_FR: 'Mises à jour internes (start-sdk 2.0.x)',
   },
   migrations: {
     up: async ({ effects }) => {},
