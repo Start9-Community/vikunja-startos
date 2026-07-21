@@ -13,7 +13,7 @@ export const manifest = setupManifest({
   volumes: ['main', 'startos'],
   images: {
     vikunja: {
-      source: { dockerTag: 'vikunja/vikunja:2.3.0' },
+      source: { dockerTag: 'vikunja/vikunja:2.4.0' },
       arch: ['x86_64', 'aarch64'],
     },
     busybox: {
