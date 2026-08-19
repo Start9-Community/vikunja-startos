@@ -103,6 +103,24 @@ const dict = {
   'Generating session secret': 97,
   'Checking for existing accounts': 98,
   'Resolving primary URL': 99,
+  // Repair action
+  Repair: 100,
+  'Detect and fix data integrity issues in the Vikunja database: duplicate task ordering, orphaned projects, missing attachment file types, and leftover position records. Run it with Dry Run on first to find out whether anything is wrong before changing anything.': 101,
+  'With Dry Run off, this writes to the Vikunja database. Run it with Dry Run on first, and take a backup before applying repairs.': 102,
+  'Repair Operation': 103,
+  'Everything — run all four checks in order. Task Positions — tasks appear in the wrong order or move around when the page reloads. Orphaned Projects — a project whose parent was deleted, which cannot be edited, un-archived, or deleted. File Types — attachments stored without a file type, usually after an upgrade. Orphaned Positions — leftover ordering records for tasks or views that no longer exist.': 104,
+  Everything: 105,
+  'Task Positions': 106,
+  'Orphaned Projects': 107,
+  'File Types': 108,
+  'Orphaned Positions': 109,
+  'Dry Run': 110,
+  'Report what would change without changing anything. Leave this on for the first run — it tells you whether there is anything to repair at all. Run it again with this off to apply the fixes.': 111,
+  'Dry run — nothing was changed.': 112,
+  'Repairs were applied.': 113,
+  'Repair Output': 114,
+  'Repair produced no output.': 115,
+  'The ${operation} repair failed: ${stderr}': 116,
 } as const
 
 /**

@@ -53,6 +53,7 @@ The actions are organized into three groups in the StartOS UI:
 - **Enable Link Sharing / Disable Link Sharing** — toggle whether users can share projects via public links. Default is disabled because anyone with a shared link can read every task and attachment on the shared project.
 - **Set Max Attachment Size** — change the upload size limit for task attachments. Accepts human-readable strings like `20MB`, `200MB`, `2GB`.
 - **Run Diagnostics** — runs Vikunja's built-in `doctor` command and returns the output. Use this when troubleshooting install or startup problems.
+- **Repair** — finds and fixes data integrity problems in the Vikunja database: tasks stuck in the wrong order, projects whose parent project was deleted (which cannot be edited, un-archived, or deleted), attachments stored without a file type, and leftover ordering records for tasks or views that no longer exist. Pick one of the four checks or **Everything**, which runs all four in order. **Run it with Dry Run on first** — it reports what it would change without changing anything, so you can see whether there is a problem at all. If it finds something, take a backup and run it again with Dry Run off to apply the fixes. Vikunja can stay running throughout.
 
 ## Limitations
 

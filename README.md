@@ -112,7 +112,7 @@ Install prepares the data directory, generates the session secret, seeds a prima
 
 ## Actions
 
-Thirteen actions, in three groups. Most run the application's command line in a temporary container rather than touching the database directly.
+Fourteen actions, in three groups. Most run the application's command line in a temporary container rather than touching the database directly.
 
 ### Accounts
 
@@ -176,6 +176,20 @@ The upload limit.
 Runs Vikunja's own diagnostic command and reports what it says.
 
 **Command output is filtered before it is shown.** Vikunja boots its whole runtime for every command-line invocation, so its real output arrives buried under startup log lines; those are stripped so an action reports its answer rather than the noise around it.
+
+#### Repair
+
+Runs one of Vikunja's four `repair` subcommands — duplicate task positions, projects orphaned by a deleted parent, attachments with no MIME type, position records for deleted tasks or views — or all four in order, and reports what each one found.
+
+**Dry run is the default**, and the description says to use it first: the repairs write to the database, and a dry run answers whether there is anything wrong before anything changes. The mode is a separate toggle rather than a fifth entry in the operation list, so *what to check* and *whether to change it* stay independent.
+
+**`repair` on its own is a help screen, not a repair** — every actual repair is a subcommand, which is why this action takes input at all rather than mirroring Doctor.
+
+**Its output cannot be filtered the way Doctor's is.** Doctor prints plain text with startup logs around it; repair reports its findings *as* log lines, so the filter that cleans Doctor up would delete the entire result. `unwrapVikunjaLogs` unwraps the `msg` field and drops bootstrap lines by message instead — including the license warning, which arrives at WARN rather than INFO.
+
+**Runnable at any status**, like Doctor. The database is in WAL mode, so a repair run alongside the daemon is a second writer rather than a conflicting one.
+
+**A failing subcommand stops the run** rather than continuing through the rest, and the error carries the output collected so far.
 
 ## Tasks
 
@@ -276,6 +290,7 @@ actions:
   - toggle-link-sharing
   - max-attachment-size
   - doctor
+  - repair
 tasks:
   - { action: user-create, severity: critical } # cleared once any account exists
   - { action: set-primary-url, severity: important } # when the stored URL is unreachable
