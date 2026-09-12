@@ -2,7 +2,7 @@ import { utils } from '@start9labs/start-sdk'
 import { storeJson } from '../../fileModels/store.json'
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
-import { getVikunjaEnv, withVikunjaCli } from '../../utils'
+import { cliFailure, getVikunjaEnv, withVikunjaCli } from '../../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -90,14 +90,16 @@ export const userCreate = sdk.Action.withInput(
         )
 
         if (res.exitCode !== 0) {
-          const stderr = res.stderr.toString().trim()
-          if (/already exists/i.test(stderr) || /duplicate/i.test(stderr)) {
+          const reason = cliFailure(res)
+          if (/already exists/i.test(reason) || /duplicate/i.test(reason)) {
             throw new Error(
               i18n('A user with that username or email already exists.'),
             )
           }
           throw new Error(
-            i18n('Vikunja could not create the user: ${stderr}', { stderr }),
+            i18n('Vikunja could not create the user: ${stderr}', {
+              stderr: reason,
+            }),
           )
         }
       },

@@ -81,8 +81,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
     },
     ready: {
       display: i18n('Web Interface'),
+      // Fetch the page rather than check the port: a bound port says the
+      // process started, a response says it is serving. Any HTTP status
+      // counts; the timeout is generous for low-power hardware.
       fn: () =>
-        sdk.healthCheck.checkPortListening(effects, uiPort, {
+        sdk.healthCheck.checkWebUrl(effects, `http://127.0.0.1:${uiPort}/`, {
+          timeout: 5_000,
           successMessage: i18n('The web interface is ready'),
           errorMessage: i18n('The web interface is not ready'),
         }),

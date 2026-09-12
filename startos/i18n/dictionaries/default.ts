@@ -64,8 +64,6 @@ const dict = {
   'Used for email links and invitations. Every address Vikunja is reachable at works in the browser regardless of this setting.': 60,
   'Set Primary URL': 61,
   'Choose which of your Vikunja URLs should serve as the primary URL.': 62,
-  'Username or user ID': 63,
-  'Run "List Users" first to see the available usernames and IDs.': 64,
   'New Password': 65,
   'Reset User Password': 66,
   'No user matches "${user}".': 67,
@@ -102,6 +100,31 @@ const dict = {
   'Generating session secret': 97,
   'Checking for existing accounts': 98,
   'Resolving primary URL': 99,
+
+  // Repair action
+  Repair: 100,
+  'Detect and fix data integrity issues in the Vikunja database: duplicate task ordering, orphaned projects, missing attachment file types, and leftover position records. Run it with Dry Run on first to find out whether anything is wrong before changing anything.': 101,
+  'With Dry Run off, this writes to the Vikunja database. Run it with Dry Run on first, and take a backup before applying repairs.': 102,
+  'Repair Operation': 103,
+  'Everything — run all four checks in order. Task Positions — tasks appear in the wrong order or move around when the page reloads. Orphaned Projects — a project whose parent was deleted, which cannot be edited, un-archived, or deleted. File Types — attachments stored without a file type, usually after an upgrade. Orphaned Positions — leftover ordering records for tasks or views that no longer exist.': 104,
+  Everything: 105,
+  'Task Positions': 106,
+  'Orphaned Projects': 107,
+  'File Types': 108,
+  'Orphaned Positions': 109,
+  'Dry Run': 110,
+  'Report what would change without changing anything. Leave this on for the first run — it tells you whether there is anything to repair at all. Run it again with this off to apply the fixes.': 111,
+  'Dry run — nothing was changed.': 112,
+  'Repairs were applied.': 113,
+  'Repair Output': 114,
+  'The ${operation} repair failed: ${stderr}': 116,
+
+  // Account picker (Reset User Password, Delete User)
+  User: 117,
+  'The account whose password to reset.': 118,
+  'The account to delete. Everything it owns is deleted with it.': 119,
+  'No Vikunja accounts were found.': 120,
+  'Could not read the Vikunja account list.': 121,
 } as const
 
 /**

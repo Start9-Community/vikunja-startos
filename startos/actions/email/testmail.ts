@@ -3,6 +3,7 @@ import { storeJson } from '../../fileModels/store.json'
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
 import {
+  cliFailure,
   customCredentials,
   getVikunjaEnv,
   mailerEnv,
@@ -91,11 +92,9 @@ export const testmail = sdk.Action.withInput(
         { env, user: 'vikunja' },
       )
       if (res.exitCode !== 0) {
-        const err = res.stderr.toString().trim()
-        const out = res.stdout.toString().trim()
         throw new Error(
           i18n('Vikunja could not send the test email: ${stderr}', {
-            stderr: err || out,
+            stderr: cliFailure(res),
           }),
         )
       }

@@ -1,59 +1,53 @@
 # Vikunja
 
-Public registration is **off** by default. On a fresh install, create your first account using the **Create User** critical task that appears immediately after install — open it before doing anything else. You provide only a username and email; Vikunja generates a strong password and returns it (you can change it later in the app). If you already have accounts, the task won't appear.
-
 ## Documentation
 
-- [Vikunja help](https://vikunja.io/help/) — Learn how to use Vikunja day to day. Start with the basics, then jump to the feature you need.
-- [Vikunja documentation](https://vikunja.io/docs/) — upstream setup, API and development guides.
+- [Vikunja help](https://vikunja.io/help/) — how to use Vikunja day to day: the basics first, then each feature.
+- [Vikunja documentation](https://vikunja.io/docs/) — the upstream setup, API and development guides.
 
 ## What you get on StartOS
 
-- A single **Web UI** interface serving Vikunja's frontend and API at `/`, and CalDAV at `/dav/`.
-- An embedded SQLite database — you never configure or log into a database, and there is no Postgres or MySQL sidecar.
-- A persistent JWT secret generated once on install, so container restarts and updates do not log you out.
-- Public registration disabled by default; you create users through StartOS actions instead.
-- SMTP that can be left off, sourced from StartOS's system SMTP (configured under **System → Email**), or pointed at a custom SMTP server.
+- One **Web UI** interface serving Vikunja, with CalDAV at `/dav/` on the same address.
+- A built-in database. There is nothing to set up or log into.
+- You stay logged in across restarts and updates.
+- Public registration is off. You add accounts with the **Create User** action.
+- Email is optional: use your server's SMTP settings, your own SMTP server, or none.
 
 ## Getting set up
 
-1. After installing, Vikunja posts one **critical** task — **Create User**. Open it, provide a username and email; Vikunja generates a strong password and returns it. **Save it** (you can change it in Vikunja later). The task disappears once a user exists — if you already have accounts (say you restored from a backup), it won't appear at all.
-2. Vikunja works at **every address you expose it at** — your `.local` address, a LAN IP, a Tor `.onion`, a custom domain — and picks up new ones automatically when you add them. Your primary URL is set to your `.local` address on install; it decides which address Vikunja puts in invitation emails and password-reset links, and changing it with the **Set Primary URL** action does not affect where you can reach the service.
-3. If you want Vikunja to send email (password resets, reminders, invites), run **Configure SMTP** under the **Email** group. Pick **System** to reuse StartOS's system SMTP, or **Custom** to enter provider credentials. Confirm with **Send Test Email**.
-4. Open the **Web UI** interface and log in with the credentials from step 1.
+1. Before Vikunja starts for the first time, StartOS asks you to run **Create User**. Enter a username and email. Vikunja generates a password and shows it once — **save it**. You can change it in Vikunja later. If accounts already exist, after a restore for example, you won't be asked.
+2. Open the **Web UI** interface and log in with that username and password.
+3. To have Vikunja send email (password resets, reminders, invitations), run **Configure SMTP**, then **Send Test Email** to confirm a message arrives.
+
+Vikunja works at every address you expose it at — your `.local` address, a LAN IP, Tor, a custom domain — including ones you add later. **Set Primary URL** only chooses which of them goes into links in emails.
 
 ## Using Vikunja
 
 ### Web interface
 
-The Web UI is the Vikunja frontend — projects, tasks, kanban boards, gantt charts, table views, filters, labels, and attachments. CalDAV is reachable at `/dav/` on the same interface; point your CalDAV client at any address Vikunja is reachable at.
+Projects, tasks, kanban boards, gantt charts, table views, filters, labels and attachments. To sync with a calendar or task app, point its CalDAV client at `/dav/` on any of Vikunja's addresses.
 
 ### Actions
 
-The actions are organized into three groups in the StartOS UI:
-
 **Accounts**
 
-- **Create User** — create a Vikunja user. You provide a username and email; Vikunja generates and returns a strong password (change it later in the app if you like). This is the critical install task until the first user exists, and stays available afterward for adding more users.
-- **List Users** — show every Vikunja user with ID, username, and email.
-- **Reset User Password** — generate a new password for a user and return it (no email sent). Use this to recover access if you're locked out.
-- **Delete User** — immediately and irreversibly delete a user and all of their projects, tasks, and attachments. StartOS shows a warning before it runs.
-- **Enable Registration / Disable Registration** — toggle public signups. Default is disabled; enable briefly if you want users to self-register, then disable again.
-- **Enable Self-Service User Deletion / Disable Self-Service User Deletion** — control whether users can delete their own accounts without admin approval. Default is enabled.
+- **Create User** — add an account. You enter a username and email; Vikunja generates the password and shows it once.
+- **List Users** — every account's ID, username and email.
+- **Reset User Password** — pick an account from the list and get a new password for it. No email is sent. Use it when someone is locked out.
+- **Delete User** — pick an account from the list and delete it, with all of its projects, tasks and attachments. This cannot be undone.
+- **Enable Registration / Disable Registration** — let people sign up on their own. It is off by default; if you turn it on, turn it off again once they have signed up.
+- **Enable / Disable Self-Service User Deletion** — whether people can delete their own accounts. It is on by default.
 
 **Email**
 
-- **Configure SMTP** — pick **Disabled**, **System** (reuse StartOS system SMTP), or **Custom** (enter your own SMTP credentials). Advanced TLS-verify and auth-type options are tucked under the Advanced section.
-- **Send Test Email** — deliver a single test message through the configured SMTP. Use this before relying on Vikunja to send reminders or password resets.
-- **Enable Email Reminders / Disable Email Reminders** — toggle Vikunja's reminder emails for assigned and overdue tasks. Default is disabled; enabling without SMTP configured does nothing (you'll see a warning).
+- **Configure SMTP** — choose **Disabled**, **System** (your server's SMTP settings) or **Custom**. The **Advanced** section holds certificate-check and authentication options.
+- **Send Test Email** — send one message with the current settings. Run it before relying on reminders or password resets.
+- **Enable / Disable Email Reminders** — reminder emails for assigned and overdue tasks. Off by default, and they need SMTP.
 
 **Other**
 
-- **Set Primary URL** — change which of your Vikunja URLs is used for links in outgoing email. It does not control where Vikunja is reachable; the web interface works at every address you expose. If the chosen URL later becomes unavailable (e.g., you remove a clearnet domain), StartOS asks you to pick a new one so email links keep working — Vikunja keeps running either way.
-- **Enable Link Sharing / Disable Link Sharing** — toggle whether users can share projects via public links. Default is disabled because anyone with a shared link can read every task and attachment on the shared project.
-- **Set Max Attachment Size** — change the upload size limit for task attachments. Accepts human-readable strings like `20MB`, `200MB`, `2GB`.
-- **Run Diagnostics** — runs Vikunja's built-in `doctor` command and returns the output. Use this when troubleshooting install or startup problems.
-
-## Limitations
-
-- **SQLite only.** PostgreSQL and MySQL/MariaDB backends are not exposed. SQLite fits the home-server and small-team use case StartOS targets.
+- **Set Primary URL** — which address goes into links in emails. If that address stops working, StartOS asks you to pick another.
+- **Enable / Disable Link Sharing** — let people share a project through a public link. Off by default: anyone with the link can read every task and attachment in that project.
+- **Set Max Attachment Size** — the upload limit, such as `20MB` or `2GB`.
+- **Run Diagnostics** — Vikunja's built-in checks. Run it when something isn't working.
+- **Repair** — finds and fixes database problems: tasks in the wrong order, projects you can't edit, archive or delete because their parent was deleted, attachments saved without a file type, and leftover ordering records. Choose one check or **Everything**. Leave **Dry Run** on the first time to see what it would change; if it finds something, take a backup and run it again with **Dry Run** off.

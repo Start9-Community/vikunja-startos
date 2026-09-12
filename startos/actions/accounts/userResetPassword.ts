@@ -2,20 +2,13 @@ import { utils } from '@start9labs/start-sdk'
 import { storeJson } from '../../fileModels/store.json'
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
-import { getVikunjaEnv, withVikunjaCli } from '../../utils'
+import { cliFailure, getVikunjaEnv, withVikunjaCli } from '../../utils'
+import { userSelect } from './userSelect'
 
-const { InputSpec, Value } = sdk
+const { InputSpec } = sdk
 
 const inputSpec = InputSpec.of({
-  user: Value.text({
-    name: i18n('Username or user ID'),
-    description: i18n(
-      'Run "List Users" first to see the available usernames and IDs.',
-    ),
-    required: true,
-    default: null,
-    minLength: 1,
-  }),
+  user: userSelect(i18n('The account whose password to reset.')),
 })
 
 export const userResetPassword = sdk.Action.withInput(
@@ -58,14 +51,16 @@ export const userResetPassword = sdk.Action.withInput(
           { env, user: 'vikunja' },
         )
         if (res.exitCode !== 0) {
-          const stderr = res.stderr.toString().trim()
-          if (/does not exist/i.test(stderr)) {
+          const reason = cliFailure(res)
+          if (/does not exist/i.test(reason)) {
             throw new Error(
               i18n('No user matches "${user}".', { user: input.user }),
             )
           }
           throw new Error(
-            i18n('Vikunja could not reset the password: ${stderr}', { stderr }),
+            i18n('Vikunja could not reset the password: ${stderr}', {
+              stderr: reason,
+            }),
           )
         }
       },

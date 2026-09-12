@@ -12,3 +12,6 @@ bun.lock
 *-logs.html
 *-logs.txt
 *.log
+# Written by `testing/injector.py enable`; a build carrying it ships an action
+# that corrupts user data, so it must never be committable
+/startos/actions/other/injectTestFaults.ts

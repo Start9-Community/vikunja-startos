@@ -17,7 +17,7 @@ export const manifest = setupManifest({
       arch: ['x86_64', 'aarch64'],
     },
     busybox: {
-      source: { dockerTag: 'docker.io/busybox:1.36.1-musl' },
+      source: { dockerTag: 'docker.io/busybox:1.38.0-musl' },
       arch: ['x86_64', 'aarch64'],
     },
   },

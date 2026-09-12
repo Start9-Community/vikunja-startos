@@ -1,9 +1,17 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '2.6.0:0',
+  version: '2.6.0:1',
   releaseNotes: {
     en_US: `Updated Vikunja to 2.6.0. This also brings in 2.5.0, which was not packaged on its own.
+
+**In this package**
+
+- Backups now include the database's write-ahead log. Backups made by earlier versions of this package could be missing recent changes (on a lightly used server, nearly all of them), so take a new backup after updating.
+- New **Repair** action, which finds and fixes data integrity problems: tasks in the wrong order, projects orphaned by a deleted parent, attachments saved without a file type, and leftover ordering records. It runs as a dry run by default.
+- **Reset User Password** and **Delete User** now let you pick the account from a list instead of typing it.
+- When an account action fails, it now shows Vikunja's own reason instead of an empty message.
+- The health check now loads the web interface instead of only checking that its port is open.
 
 **Security**
 
@@ -24,6 +32,14 @@ export const current = VersionInfo.of({
 Full release notes: [2.5.0](https://vikunja.io/changelog/vikunja-2.5.0-was-released/), [2.6.0](https://vikunja.io/changelog/vikunja-2.6.0-was-released/)`,
     es_ES: `Vikunja actualizado a 2.6.0. Incluye también 2.5.0, que no se empaquetó por separado.
 
+**En este paquete**
+
+- Las copias de seguridad ahora incluyen el registro de escritura anticipada (WAL) de la base de datos. Las copias hechas con versiones anteriores de este paquete podían omitir los cambios recientes (en un servidor con poco uso, casi todos), así que haga una copia nueva después de actualizar.
+- Nueva acción **Reparar**, que detecta y corrige problemas de integridad de datos: tareas en el orden equivocado, proyectos huérfanos por la eliminación de su proyecto padre, adjuntos guardados sin tipo de archivo y registros de orden sobrantes. De forma predeterminada se ejecuta como simulación.
+- **Restablecer contraseña de usuario** y **Eliminar usuario** ahora permiten elegir la cuenta de una lista en lugar de escribirla.
+- Cuando una acción de cuentas falla, ahora muestra el motivo que da Vikunja en lugar de un mensaje vacío.
+- La comprobación de estado ahora carga la interfaz web en lugar de solo comprobar que su puerto está abierto.
+
 **Seguridad**
 
 - 2.6.0 corrige 18 problemas de seguridad, cinco de ellos de gravedad alta, y 2.5.0 corrigió uno más. Entre ellos: un enlace compartido podía actuar como otro usuario u obtener una sesión de administrador; una importación, un filtro o una imagen manipulados podían bloquear el servidor agotando su memoria; los miembros de equipos, las direcciones de correo y los secretos de doble factor eran visibles para usuarios que no debían verlos; y algunos puntos de inicio de sesión, incluido el de CalDAV, no limitaban los intentos. Actualice, por favor.
@@ -42,6 +58,14 @@ Full release notes: [2.5.0](https://vikunja.io/changelog/vikunja-2.5.0-was-relea
 
 Notas de la versión completas: [2.5.0](https://vikunja.io/changelog/vikunja-2.5.0-was-released/), [2.6.0](https://vikunja.io/changelog/vikunja-2.6.0-was-released/)`,
     de_DE: `Vikunja auf 2.6.0 aktualisiert. Enthält auch 2.5.0, das nicht einzeln paketiert wurde.
+
+**In diesem Paket**
+
+- Sicherungen enthalten jetzt das Write-Ahead-Log der Datenbank. Mit früheren Versionen dieses Pakets erstellte Sicherungen konnten jüngste Änderungen auslassen (auf einem wenig genutzten Server fast alle). Erstellen Sie daher nach dem Update eine neue Sicherung.
+- Neue Aktion **Reparieren**: Sie findet und behebt Datenintegritätsprobleme — Aufgaben in falscher Reihenfolge, durch ein gelöschtes übergeordnetes Projekt verwaiste Projekte, ohne Dateityp gespeicherte Anhänge und übrig gebliebene Sortierdatensätze. Standardmäßig läuft sie als Probelauf.
+- **Benutzerpasswort zurücksetzen** und **Benutzer löschen** lassen das Konto jetzt aus einer Liste auswählen, statt es einzutippen.
+- Schlägt eine Kontoaktion fehl, zeigt sie jetzt die Begründung von Vikunja statt einer leeren Meldung.
+- Die Zustandsprüfung lädt jetzt die Weboberfläche, statt nur zu prüfen, ob ihr Port offen ist.
 
 **Sicherheit**
 
@@ -62,6 +86,14 @@ Notas de la versión completas: [2.5.0](https://vikunja.io/changelog/vikunja-2.5
 Vollständige Versionshinweise: [2.5.0](https://vikunja.io/changelog/vikunja-2.5.0-was-released/), [2.6.0](https://vikunja.io/changelog/vikunja-2.6.0-was-released/)`,
     pl_PL: `Zaktualizowano Vikunję do 2.6.0. Zawiera też wersję 2.5.0, która nie została spakowana osobno.
 
+**W tym pakiecie**
+
+- Kopie zapasowe zawierają teraz dziennik zapisu z wyprzedzeniem (WAL) bazy danych. Kopie wykonane poprzednimi wersjami tego pakietu mogły pomijać ostatnie zmiany (na rzadko używanym serwerze prawie wszystkie), dlatego po aktualizacji wykonaj nową kopię zapasową.
+- Nowa akcja **Napraw**: wykrywa i naprawia problemy ze spójnością danych — zadania w złej kolejności, projekty osierocone po usunięciu projektu nadrzędnego, załączniki zapisane bez typu pliku oraz pozostawione rekordy kolejności. Domyślnie działa w trybie próbnym.
+- **Resetuj hasło użytkownika** i **Usuń użytkownika** pozwalają teraz wybrać konto z listy zamiast je wpisywać.
+- Gdy akcja dotycząca kont się nie powiedzie, pokazuje teraz przyczynę podaną przez Vikunję zamiast pustego komunikatu.
+- Kontrola stanu wczytuje teraz interfejs webowy zamiast tylko sprawdzać, czy jego port jest otwarty.
+
 **Bezpieczeństwo**
 
 - 2.6.0 naprawia 18 problemów bezpieczeństwa, z czego pięć oceniono jako poważne, a 2.5.0 naprawiła jeszcze jeden. Wśród nich: link udostępniania mógł działać jako inny użytkownik lub uzyskać sesję administratora; spreparowany import, filtr lub obraz mógł zawiesić serwer, wyczerpując jego pamięć; członkowie zespołów, adresy e-mail i sekrety uwierzytelniania dwuskładnikowego były widoczne dla użytkowników, którzy nie powinni ich widzieć; a niektóre punkty logowania, w tym CalDAV, nie ograniczały liczby prób. Prosimy o aktualizację.
@@ -80,6 +112,14 @@ Vollständige Versionshinweise: [2.5.0](https://vikunja.io/changelog/vikunja-2.5
 
 Pełne informacje o wydaniu: [2.5.0](https://vikunja.io/changelog/vikunja-2.5.0-was-released/), [2.6.0](https://vikunja.io/changelog/vikunja-2.6.0-was-released/)`,
     fr_FR: `Vikunja mis à jour vers 2.6.0. Inclut aussi la 2.5.0, qui n'a pas été empaquetée séparément.
+
+**Dans ce paquet**
+
+- Les sauvegardes incluent désormais le journal d'écriture anticipée (WAL) de la base de données. Les sauvegardes faites avec les versions précédentes de ce paquet pouvaient omettre les modifications récentes (sur un serveur peu utilisé, presque toutes) ; faites donc une nouvelle sauvegarde après la mise à jour.
+- Nouvelle action **Réparer** : elle détecte et corrige les problèmes d'intégrité des données — tâches dans le mauvais ordre, projets orphelins après la suppression de leur parent, pièces jointes enregistrées sans type de fichier et enregistrements de tri résiduels. Elle s'exécute par défaut en simulation.
+- **Réinitialiser le mot de passe utilisateur** et **Supprimer l'utilisateur** permettent désormais de choisir le compte dans une liste au lieu de le saisir.
+- Quand une action sur les comptes échoue, elle affiche désormais la raison donnée par Vikunja au lieu d'un message vide.
+- La vérification d'état charge désormais l'interface web au lieu de seulement vérifier que son port est ouvert.
 
 **Sécurité**
 

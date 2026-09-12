@@ -10,6 +10,7 @@ import { testmail } from './email/testmail'
 import { toggleEmailReminders } from './email/toggleEmailReminders'
 import { doctor } from './other/doctor'
 import { maxAttachmentSize } from './other/maxAttachmentSize'
+import { repair } from './other/repair'
 import { setPrimaryUrl } from './other/setPrimaryUrl'
 import { toggleLinkSharing } from './other/toggleLinkSharing'
 
@@ -30,3 +31,4 @@ export const actions = sdk.Actions.of()
   .addAction(toggleLinkSharing)
   .addAction(maxAttachmentSize)
   .addAction(doctor)
+  .addAction(repair)

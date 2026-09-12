@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="Vikunja Logo" width="21%">
+  <img src="icon.svg" alt="Vikunja Logo" width="21%">
 </p>
 
 # Vikunja on StartOS
@@ -112,70 +112,92 @@ Install prepares the data directory, generates the session secret, seeds a prima
 
 ## Actions
 
-Thirteen actions, in three groups. Most run the application's command line in a temporary container rather than touching the database directly.
+Fourteen actions, in three groups, and they work in two ways.
+
+**The account and maintenance actions run Vikunja's own command-line tool** in a short-lived container against the live database. Each one boots Vikunja's runtime, so expect a few seconds per run. Running alongside the server is safe: SQLite is in WAL mode and waits on a busy lock rather than failing. Vikunja reports a failure on stdout rather than stderr; the package reads both, so an error arrives with Vikunja's reason attached.
+
+**The settings actions write `store.json`**, which the server reads at start. Saving one restarts Vikunja, which costs a few seconds of downtime and no data. Every one of them is safe to repeat.
 
 ### Accounts
 
 #### Create User
 
-Creates an account with a username, password, and optional email.
+The way to make the first account, and any later one while public registration is off.
 
-- **The way to make the first account**, and the action the install task points at.
-- **Runnable at any status.**
+- **Changes:** adds the account, and records that a first account exists, which retires the install task.
+- **Outputs:** the username and a generated password, shown once. StartOS keeps no copy; a lost password is what Reset User Password is for.
+- **Repeat safety:** a second run with a username or email that is already taken fails without changing anything.
 
-#### List Users, Reset User Password, Delete User
+#### List Users
 
-Read the account list, set a new password for one, or remove one.
+Read-only. If Vikunja ever changes its table format, the action shows the raw output rather than an empty list.
 
-- **Reset and delete require the service to be running.**
-- **Deleting a user is subject to Vikunja's own deletion setting** — see the toggle below.
+#### Reset User Password
 
-#### Enable Public Registration
+For a locked-out user, or to prove an account survived a restore.
 
-Turns anonymous sign-up on or off.
+- **Input:** the account, picked from a list read from the database when the form opens.
+- **Outputs:** a new generated password, shown once. No email is sent.
+- **Repeat safety:** every run replaces the password again.
 
-- **Off by default.** Turning it on means anyone who can reach the address can create an account.
+#### Delete User
 
-#### Enable User Deletion
+Removes the account and everything it owns — projects, tasks, attachments — immediately, with no confirmation email.
 
-Controls whether users may delete their own accounts.
+- **Input:** the same account list.
+- **Irreversible.** Only a backup brings the account back.
+- **Repeat safety:** the account leaves the list; a form opened before the deletion fails with "no user matches".
+
+#### Enable Registration / Disable Registration
+
+Off by default. While it is on, anyone who can reach any exposed address can create an account.
+
+#### Enable / Disable Self-Service User Deletion
+
+Whether users can delete their own accounts from Vikunja's settings. On by default.
 
 ### Email
 
 #### Configure SMTP
 
-Points Vikunja at a mail server — the one StartOS provides, or one you supply, with the transport security, authentication type and certificate-verification behavior alongside it.
+Disabled, the server's system SMTP, or custom credentials, with certificate verification and the authentication type under Advanced.
 
 #### Send Test Email
 
-Sends a message with the current settings, so a misconfiguration surfaces here rather than as a reminder that never arrives.
+Sends one message with the saved settings, without a restart. Run it after Configure SMTP; a failure carries the mailer's own error.
 
 #### Enable Email Reminders
 
-Turns reminder emails on or off. They need SMTP configured to do anything.
+Has no effect until SMTP is configured.
 
 ### Other
 
 #### Set Primary URL
 
-Chooses which of the service's addresses is used in outgoing links.
-
-- **Pre-populated from the addresses StartOS has assigned**, rather than typed in freehand.
-- **It does not control access.** Every reachable address is accepted regardless; this is the one that appears in emails and redirects.
+The address used in links in outgoing email, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless.
 
 #### Enable Link Sharing
 
-Controls whether tasks and projects can be shared by public link. **Off by default.**
+Off by default. A shared link exposes every task and attachment in its project.
 
-#### Maximum Attachment Size
+#### Set Max Attachment Size
 
-The upload limit.
+The upload limit, as a size string such as `20MB` or `2GB`.
 
-#### Doctor
+#### Run Diagnostics
 
-Runs Vikunja's own diagnostic command and reports what it says.
+Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lines are stripped so the report is what remains.
 
-**Command output is filtered before it is shown.** Vikunja boots its whole runtime for every command-line invocation, so its real output arrives buried under startup log lines; those are stripped so an action reports its answer rather than the noise around it.
+#### Repair
+
+Runs one of `vikunja repair`'s four subcommands, or all four in order.
+
+- **When:** tasks that appear out of order or move on reload, a project that cannot be edited, archived or deleted because its parent is gone, attachments stored without a file type (usually after an upgrade), or leftover ordering records.
+- **Changes:** nothing with Dry Run on, the default. With it off, the rows each check reports.
+- **Cost:** seconds for most checks. File Types inspects every attachment, so it grows with attachment storage.
+- **Repeat safety:** idempotent. A second run against a healthy database reports nothing to fix.
+- **What happens next:** no restart. Refresh the web interface to see the result.
+- **On failure:** the run stops at the first check that fails, and the error carries the output of the checks before it.
 
 ## Tasks
 
@@ -194,19 +216,19 @@ Two, at different severities.
 
 One check, on the only daemon.
 
-| Check     | Displayed as    | Method                 | Grace |
-| --------- | --------------- | ---------------------- | ----- |
-| `vikunja` | "Web Interface" | Port 3456 is listening | 30s   |
+| Check     | Displayed as    | Method                                       | Grace |
+| --------- | --------------- | -------------------------------------------- | ----- |
+| `vikunja` | "Web Interface" | HTTP fetch of the web interface on port 3456 | 30s   |
 
-It reports that the interface is serving. **It says nothing about email**: a wrong SMTP setting shows a green check and a reminder that never arrives, which is what the test-email action is for.
+It loads the page, so it goes green only when Vikunja is answering requests, not merely holding the port. Any HTTP response counts; a fetch that errors or takes longer than five seconds fails. **It says nothing about email**: a wrong SMTP setting shows a green check and a reminder that never arrives, which is what the test-email action is for.
 
 **A daemon that restarts in a loop with no failing check is almost always the session secret** — the start-up path refuses to run without one and logs which of the two causes it was, because StartOS otherwise surfaces a thrown start as a silent retry every few seconds.
 
 ## Backups and Restore
 
-Both volumes are copied, with SQLite's sidecar files excluded — `sdk.Backups.ofVolumes('main', 'startos').setOptions({ exclude })`.
+Both volumes are copied wholesale — `sdk.Backups.ofVolumes('main', 'startos')` — with only SQLite's shared-memory index (`*-shm`) excluded. StartOS stops the service before a backup, so the files are copied at rest.
 
-**The write-ahead log, journal and shared-memory files are left out on purpose.** Capturing them mid-write can restore a database that disagrees with itself; excluding them restores the database as of its last consistent state.
+**The write-ahead log is part of the database and is always included.** Vikunja runs SQLite in WAL mode and does not checkpoint on shutdown, so recent writes — on a lightly used server, nearly all of them — live only in `vikunja.db-wal`. Earlier versions of this package excluded that file, and their backups restore without those writes; take a new backup after updating. The `-shm` file is an index SQLite rebuilds on open.
 
 What the backup holds is everything: the tasks, the attachments, the accounts, the session secret, and the SMTP credentials.
 
@@ -216,7 +238,7 @@ What the backup holds is everything: the tasks, the attachments, the accounts, t
 
 1. **SQLite only.** There is no option to point Vikunja at PostgreSQL or MySQL.
 2. **Public registration is off by default**, so the first account comes from an action.
-3. **Accounts are managed by action**, and most of those actions require the service running.
+3. **Accounts are managed by action.** Reset User Password and Delete User pick from the accounts that exist when the form opens.
 4. **A newly added address is accepted immediately as an origin**, but the primary URL used in emails is a separate choice.
 5. **The timezone is fixed to UTC.**
 6. **Link sharing is off by default.**
@@ -276,6 +298,7 @@ actions:
   - toggle-link-sharing
   - max-attachment-size
   - doctor
+  - repair
 tasks:
   - { action: user-create, severity: critical } # cleared once any account exists
   - { action: set-primary-url, severity: important } # when the stored URL is unreachable
