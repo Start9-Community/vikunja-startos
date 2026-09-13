@@ -43,9 +43,11 @@ Two images: the application, and a shell for the jobs it cannot do itself.
 | Architectures | x86_64, aarch64                 |
 | Command       | The image's own entrypoint      |
 
-| Subcontainer  | Purpose                                  |
-| ------------- | ---------------------------------------- |
-| `vikunja-sub` | The only daemon — the one to `attach` to |
+| Subcontainer                 | Purpose                                                                                                                                                                                                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vikunja-sub`                | The daemon, and the only one that outlives a command — this is the one to `attach` to                                                                                                                                                                                                             |
+| `vikunja-<command>`          | One short-lived container per command-line action (`vikunja-doctor`, `vikunja-repair`, `vikunja-user-list`, `vikunja-user-create`, `vikunja-user-delete`, `vikunja-user-reset-password`, `vikunja-testmail`). Each exists only while its action runs, so there is nothing to attach to afterwards |
+| `vikunja-init-volume-layout` | BusyBox, during init only — creates the data subdirectories and fixes their ownership                                                                                                                                                                                                             |
 
 **The upstream image is built `FROM scratch`, and that has a concrete consequence.** It declares a numeric user but ships no `/etc/passwd` or `/etc/group`, so resolving that user fails. The package plants minimal entries into every subcontainer's filesystem before anything runs — the daemon and each command-line action alike.
 
@@ -166,7 +168,7 @@ Disabled, the server's system SMTP, or custom credentials, with certificate veri
 
 Sends one message with the saved settings, without a restart. Run it after Configure SMTP; a failure carries the mailer's own error.
 
-#### Enable Email Reminders
+#### Enable / Disable Email Reminders
 
 Has no effect until SMTP is configured.
 
@@ -176,7 +178,7 @@ Has no effect until SMTP is configured.
 
 The address used in links in outgoing email, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless.
 
-#### Enable Link Sharing
+#### Enable / Disable Link Sharing
 
 Off by default. A shared link exposes every task and attachment in its project.
 
@@ -192,7 +194,7 @@ Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lin
 
 Runs one of `vikunja repair`'s four subcommands, or all four in order.
 
-- **When:** tasks that appear out of order or move on reload, a project that cannot be edited, archived or deleted because its parent is gone, attachments stored without a file type (usually after an upgrade), or leftover ordering records.
+- **When:** tasks that appear out of order or move on reload, a project that cannot be edited, archived or deleted because its parent is gone, attachments stored without a file type (usually after an upgrade), or leftover ordering records. Duplicate ordering records are the common case and the hardest to attribute — nothing surfaces them except the ordering itself, and Vikunja offers no way to repair them from the web interface. A dry run costs seconds and is the cheapest way to rule them in or out, so it is worth one pass after any upgrade.
 - **Changes:** nothing with Dry Run on, the default. With it off, the rows each check reports.
 - **Cost:** seconds for most checks. File Types inspects every attachment, so it grows with attachment storage.
 - **Repeat safety:** idempotent. A second run against a healthy database reports nothing to fix.
@@ -256,7 +258,9 @@ architectures:
   - x86_64
   - aarch64
 subcontainers:
-  - vikunja-sub # /etc/passwd + /etc/group are planted before anything executes
+  - vikunja-sub # the daemon; /etc/passwd + /etc/group are planted before anything executes
+  - vikunja-<command> # one per CLI action, alive only while that action runs
+  - vikunja-init-volume-layout # busybox, init only
 volumes:
   main: /data # db/ and files/ subdirs; the ROOT is mounted, not the subpaths
   startos: null # store.json only, not mounted
