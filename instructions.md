@@ -46,7 +46,7 @@ Projects, tasks, kanban boards, gantt charts, table views, filters, labels and a
 
 **Other**
 
-- **Set Primary URL** — which address goes into links in emails, and which one **Open UI** opens. If that address stops working, Vikunja uses its `.local` address until it returns, and StartOS asks you to pick another.
+- **Set Primary URL** — which address goes into links in emails, and which one **Open UI** opens. If its hostname is no longer offered by the interface, StartOS asks you to pick another. Vikunja prefers an available public domain (HTTPS first), then `.local`, then another offered address. If none are offered, it retains the stored URL.
 - **Enable / Disable Link Sharing** — let people share a project through a public link. Off by default: anyone with the link can read every task and attachment in that project.
 - **Set Max Attachment Size** — the upload limit, such as `20MB` or `2GB`.
 - **Run Diagnostics** — Vikunja's built-in checks. Run it when something isn't working.

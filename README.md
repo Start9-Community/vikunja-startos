@@ -84,7 +84,7 @@ Storing settings under their environment-variable names means they pass straight
 
 **The accepted origins are computed from the interface's current addresses.** The frontend may be loaded from any address you have exposed, and every one of them has to be an accepted origin — so the list is rebuilt at start and is reactive, meaning adding a Tor address later re-runs with it already allowed.
 
-**The primary URL is used for outbound links and is what Open UI opens.** The daemon gets the chosen URL while it is one of the interface's addresses, and the `.local` address otherwise, so it never runs with a stale one. Vikunja refuses to start when it is empty while cross-origin checking is on, so with no address at all cross-origin checking is switched off rather than letting the daemon abort.
+**The primary URL is used for outbound links and is what Open UI opens.** The daemon follows the chosen hostname, including changes to its port or scheme. If that hostname is absent, it prefers a public domain (HTTPS first), then `.local`, then another offered address. With no offered address, it retains a nonempty stored URL. Vikunja refuses to start when the primary URL is empty while cross-origin checking is on, so cross-origin checking is switched off when no URL can be resolved.
 
 ## Dependencies
 
@@ -176,7 +176,7 @@ Has no effect until SMTP is configured.
 
 #### Set Primary URL
 
-The address used in links in outgoing email, and the one Open UI opens, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless. While the chosen address is not one of the interface's addresses, the daemon uses the `.local` address and the task is raised again.
+The address used in links in outgoing email, and the one Open UI opens, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless. While the chosen hostname is absent, the daemon uses the fallback described above and the task is raised again.
 
 #### Enable / Disable Link Sharing
 
@@ -205,14 +205,14 @@ Runs one of `vikunja repair`'s four subcommands, or all four in order.
 
 Two, at different severities.
 
-| Task            | Severity    | Raised when                                                                 | Cleared when                                       |
-| --------------- | ----------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| Create User     | `critical`  | An init that finds no account exists                                        | An account exists                                  |
-| Set Primary URL | `important` | No URL is chosen, or the chosen one is not one of the interface's addresses | The chosen URL is one of the interface's addresses |
+| Task            | Severity    | Raised when                                                   | Cleared when                                    |
+| --------------- | ----------- | ------------------------------------------------------------- | ----------------------------------------------- |
+| Create User     | `critical`  | An init that finds no account exists                          | An account exists                               |
+| Set Primary URL | `important` | No URL is chosen, or the chosen hostname is no longer offered | The chosen hostname is offered by the interface |
 
 `critical` blocks the service from starting; the first account has to exist.
 
-**The URL task is deliberately only `important`.** An unset or stale primary URL costs correct links in outgoing email, not access — because every reachable address is accepted as an origin regardless, and the daemon falls back to the `.local` address.
+**The URL task is deliberately only `important`.** It does not block startup: every reachable address is accepted as an origin regardless, and the daemon uses an offered fallback address when the chosen hostname is absent.
 
 ## Health Checks
 
