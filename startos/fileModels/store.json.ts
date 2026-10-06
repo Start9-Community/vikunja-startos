@@ -4,7 +4,7 @@ import { sdk } from '../sdk'
 export const defaultMaxAttachmentSize = '20MB'
 
 const smtpAdvancedShape = z
-  .object({
+  .looseObject({
     skipTlsVerify: z.boolean().catch(false),
     authType: z.enum(['plain', 'login', 'cram-md5']).catch('plain'),
   })
@@ -17,7 +17,7 @@ const smtpAdvancedShape = z
 // package state, never an env var) and the SMTP fields, which can't be flat
 // env values: system credentials are read from StartOS at runtime, so they
 // stay structured and resolve to VIKUNJA_MAILER_* in getVikunjaEnv.
-const shape = z.object({
+const shape = z.looseObject({
   initialUserCreated: z.boolean().catch(false),
 
   VIKUNJA_SERVICE_SECRET: z.string().optional().catch(undefined),

@@ -1,13 +1,13 @@
 import { actions } from '../actions'
 import { restoreInit } from '../backups'
-import { setDependencies } from '../dependencies'
+import { dependencies } from '../dependencies'
 import { setInterfaces } from '../interfaces'
 import { sdk } from '../sdk'
 import { versionGraph } from '../versions'
 import { ensureSecret } from './ensureSecret'
 import { initVolumeLayout } from './initVolumeLayout'
+import { primaryUrlTask } from './primaryUrlTask'
 import { seedFiles } from './seedFiles'
-import { setupPrimaryUrl } from './setupPrimaryUrl'
 import { watchInitialUser } from './watchInitialUser'
 
 export const init = sdk.setupInit(
@@ -17,10 +17,10 @@ export const init = sdk.setupInit(
   initVolumeLayout,
   ensureSecret,
   setInterfaces,
-  setDependencies,
   actions,
+  dependencies,
   watchInitialUser,
-  setupPrimaryUrl,
+  primaryUrlTask,
 )
 
 export const uninit = sdk.setupUninit(versionGraph)

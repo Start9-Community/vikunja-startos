@@ -1,3 +1,4 @@
+import { primaryUrl } from '../primaryUrl'
 import { sdk } from '../sdk'
 import { toggleRegistration } from './accounts/toggleRegistration'
 import { toggleUserDeletion } from './accounts/toggleUserDeletion'
@@ -11,7 +12,6 @@ import { toggleEmailReminders } from './email/toggleEmailReminders'
 import { doctor } from './other/doctor'
 import { maxAttachmentSize } from './other/maxAttachmentSize'
 import { repair } from './other/repair'
-import { setPrimaryUrl } from './other/setPrimaryUrl'
 import { toggleLinkSharing } from './other/toggleLinkSharing'
 
 export const actions = sdk.Actions.of()
@@ -27,7 +27,7 @@ export const actions = sdk.Actions.of()
   .addAction(testmail)
   .addAction(toggleEmailReminders)
   // Group: Other
-  .addAction(setPrimaryUrl)
+  .addAction(primaryUrl.action)
   .addAction(toggleLinkSharing)
   .addAction(maxAttachmentSize)
   .addAction(doctor)

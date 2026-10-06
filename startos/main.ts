@@ -1,6 +1,7 @@
 import { T } from '@start9labs/start-sdk'
 import { storeJson } from './fileModels/store.json'
 import { i18n } from './i18n'
+import { primaryUrl } from './primaryUrl'
 import { sdk } from './sdk'
 import {
   customCredentials,
@@ -33,11 +34,9 @@ export const main = sdk.setupMain(async ({ effects }) => {
   // already in the allowlist.
   const urls = await getWebuiUrls(effects)
 
-  // publicurl is only used for outbound links (emails, migration redirects),
-  // but Vikunja refuses to start if it is empty while CORS is on. Fall back to
-  // any reachable address so a service whose primary URL was never seeded still
-  // boots; with no address at all, CORS goes off rather than aborting startup.
-  const publicUrl = store?.VIKUNJA_SERVICE_PUBLICURL || urls[0] || ''
+  // Vikunja refuses to start with an empty publicurl while CORS is on; with no
+  // address at all, CORS goes off rather than aborting startup.
+  const publicUrl = (await primaryUrl.bestUsable(effects).const()) ?? ''
 
   const env = getVikunjaEnv(
     store && { ...store, VIKUNJA_SERVICE_PUBLICURL: publicUrl },

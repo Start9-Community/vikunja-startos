@@ -16,7 +16,7 @@ const advancedSpec = InputSpec.of({
   authType: Value.select({
     name: i18n('Auth Type'),
     description: i18n(
-      'SMTP authentication mechanism. Plain is correct for most servers.',
+      'Use the mechanism your SMTP provider names, or Plain if it names none.\n- Plain: sends the username and password over the connection\n- Login: also sends the username and password, for servers that do not accept Plain\n- CRAM-MD5: proves the password without sending it, for servers that require it',
     ),
     default: 'plain',
     values: {

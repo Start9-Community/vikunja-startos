@@ -20,7 +20,9 @@ export const toggleLinkSharing = sdk.Action.withoutInput(
             'Public link sharing is currently disabled. Run this action to permit users to share projects via a public link.',
           ),
       warning: on
-        ? null
+        ? i18n(
+            'Users will no longer be able to share projects through a public link.',
+          )
         : i18n(
             'Anyone with a shared link can read all tasks and attachments on the shared project. Do not enable this if any project contains sensitive data.',
           ),

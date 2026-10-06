@@ -84,7 +84,7 @@ Storing settings under their environment-variable names means they pass straight
 
 **The accepted origins are computed from the interface's current addresses.** The frontend may be loaded from any address you have exposed, and every one of them has to be an accepted origin — so the list is rebuilt at start and is reactive, meaning adding a Tor address later re-runs with it already allowed.
 
-**The primary URL is only used for outbound links**, but Vikunja refuses to start when it is empty while cross-origin checking is on. So it falls back to any reachable address, and with no address at all cross-origin checking is switched off rather than letting the daemon abort.
+**The primary URL is used for outbound links and is what Open UI opens.** The daemon gets the chosen URL while it is one of the interface's addresses, and the `.local` address otherwise, so it never runs with a stale one. Vikunja refuses to start when it is empty while cross-origin checking is on, so with no address at all cross-origin checking is switched off rather than letting the daemon abort.
 
 ## Dependencies
 
@@ -106,7 +106,7 @@ One interface.
 
 ## Installation and First-Run Flow
 
-Install prepares the data directory, generates the session secret, seeds a primary URL from the addresses available, and then raises a `critical` task: create the first user.
+Install prepares the data directory, generates the session secret, raises an `important` task to choose the primary URL, and raises a `critical` task: create the first user.
 
 **That task is the only way to bootstrap an account**, because registration is disabled — and the ownership work happens at init rather than in the daemon chain precisely so the task is reachable before the daemon has ever started.
 
@@ -118,7 +118,7 @@ Fourteen actions, in three groups, and they work in two ways.
 
 **The account and maintenance actions run Vikunja's own command-line tool** in a short-lived container against the live database. Each one boots Vikunja's runtime, so expect a few seconds per run. Running alongside the server is safe: SQLite is in WAL mode and waits on a busy lock rather than failing. Vikunja reports a failure on stdout rather than stderr; the package reads both, so an error arrives with Vikunja's reason attached.
 
-**The settings actions write `store.json`**, which the server reads at start. Saving one restarts Vikunja, which costs a few seconds of downtime and no data. Every one of them is safe to repeat.
+**The settings actions write `store.json`**, which the server reads at start. Saving one restarts Vikunja, which costs a few seconds of downtime and no data. Every one of them is safe to repeat. Each Enable / Disable toggle asks for confirmation first, naming what the change does.
 
 ### Accounts
 
@@ -176,7 +176,7 @@ Has no effect until SMTP is configured.
 
 #### Set Primary URL
 
-The address used in links in outgoing email, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless.
+The address used in links in outgoing email, and the one Open UI opens, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless. While the chosen address is not one of the interface's addresses, the daemon uses the `.local` address and the task is raised again.
 
 #### Enable / Disable Link Sharing
 
@@ -188,7 +188,7 @@ The upload limit, as a size string such as `20MB` or `2GB`.
 
 #### Run Diagnostics
 
-Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lines are stripped so the report is what remains.
+Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lines are stripped so the report is what remains. The report comes back in a copyable box, also offered as `vikunja-doctor.txt`.
 
 #### Repair
 
@@ -198,21 +198,21 @@ Runs one of `vikunja repair`'s four subcommands, or all four in order.
 - **Changes:** nothing with Dry Run on, the default. With it off, the rows each check reports.
 - **Cost:** seconds for most checks. File Types inspects every attachment, so it grows with attachment storage.
 - **Repeat safety:** idempotent. A second run against a healthy database reports nothing to fix.
-- **What happens next:** no restart. Refresh the web interface to see the result.
+- **What happens next:** no restart. The report comes back in a copyable box, also offered as `vikunja-repair.txt`. Refresh the web interface to see the result.
 - **On failure:** the run stops at the first check that fails, and the error carries the output of the checks before it.
 
 ## Tasks
 
 Two, at different severities.
 
-| Task            | Severity    | Raised when                           | Cleared when           |
-| --------------- | ----------- | ------------------------------------- | ---------------------- |
-| Create User     | `critical`  | An init that finds no account exists  | An account exists      |
-| Set Primary URL | `important` | The stored URL is no longer reachable | A reachable URL is set |
+| Task            | Severity    | Raised when                                                                 | Cleared when                                       |
+| --------------- | ----------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| Create User     | `critical`  | An init that finds no account exists                                        | An account exists                                  |
+| Set Primary URL | `important` | No URL is chosen, or the chosen one is not one of the interface's addresses | The chosen URL is one of the interface's addresses |
 
 `critical` blocks the service from starting; the first account has to exist.
 
-**The URL task is deliberately only `important`.** A stale primary URL costs correct links in outgoing email, not access — because every reachable address is accepted as an origin regardless, and the daemon falls back to one of them.
+**The URL task is deliberately only `important`.** An unset or stale primary URL costs correct links in outgoing email, not access — because every reachable address is accepted as an origin regardless, and the daemon falls back to the `.local` address.
 
 ## Health Checks
 
@@ -305,7 +305,7 @@ actions:
   - repair
 tasks:
   - { action: user-create, severity: critical } # cleared once any account exists
-  - { action: set-primary-url, severity: important } # when the stored URL is unreachable
+  - { action: set-primary-url, severity: important } # while no URL is chosen or the chosen one is gone
 health_checks:
   - vikunja # displayed "Web Interface"; says nothing about email
 ```

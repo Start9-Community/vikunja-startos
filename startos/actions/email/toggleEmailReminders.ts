@@ -27,12 +27,15 @@ export const toggleEmailReminders = sdk.Action.withoutInput(
         : i18n(
             'Email reminders for assigned and overdue tasks are currently disabled. Run this action to enable them.',
           ),
-      warning:
-        !on && smtpDisabled
+      warning: on
+        ? i18n('Vikunja will stop emailing task reminders to users.')
+        : smtpDisabled
           ? i18n(
               'SMTP is currently disabled. Enabling email reminders has no effect until you configure SMTP via Configure SMTP.',
             )
-          : null,
+          : i18n(
+              'Vikunja will start emailing users reminders for their assigned and overdue tasks.',
+            ),
       allowedStatuses: 'any',
       group: i18n('Email'),
       visibility: 'enabled',
