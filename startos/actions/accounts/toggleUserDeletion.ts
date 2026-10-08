@@ -21,7 +21,13 @@ export const toggleUserDeletion = sdk.Action.withoutInput(
         : i18n(
             'Users must currently ask an admin to delete their account. Run this action to let them self-delete.',
           ),
-      warning: null,
+      warning: on
+        ? i18n(
+            'Users will no longer be able to delete their own accounts. An admin can still remove one with Delete User.',
+          )
+        : i18n(
+            'Users will be able to delete their own accounts without asking an admin.',
+          ),
       allowedStatuses: 'any',
       group: i18n('Accounts'),
       visibility: 'enabled',

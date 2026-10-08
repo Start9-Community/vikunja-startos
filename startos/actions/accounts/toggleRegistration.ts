@@ -20,7 +20,9 @@ export const toggleRegistration = sdk.Action.withoutInput(
             'Public registration is currently disabled. Run this action to permit new signups.',
           ),
       warning: on
-        ? null
+        ? i18n(
+            'People can no longer sign up on their own. Existing accounts are unaffected, and Create User still adds accounts.',
+          )
         : i18n(
             'Anyone who can reach your Vikunja URL will be able to create an account on your instance. Disable this again as soon as your users have signed up.',
           ),

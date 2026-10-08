@@ -30,14 +30,13 @@ export const userList = sdk.Action.withoutInput(
       }
     }
 
-    // Parser failed (unexpected output format): fall back to dumping the
-    // raw text in the message so the user still sees something useful.
+    // Parser failed (unexpected output format): show the raw table instead.
     if (users.length === 0) {
       return {
         version: '1' as const,
         title: i18n('Vikunja Users'),
-        message: raw,
-        result: null,
+        message: null,
+        result: { type: 'multiline' as const, value: raw, copyable: true },
       }
     }
 

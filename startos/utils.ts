@@ -44,10 +44,9 @@ export async function plantPasswd(sub: {
 
 /**
  * Read the URLs of the 'webui' service interface (excluding localhost and
- * link-local). Three consumers: the Set Primary URL dropdown, the auto-seed of
- * a .local URL on install, and the daemon's CORS allowlist — the frontend may
- * be loaded from any of these addresses, so every one of them has to be an
- * accepted origin.
+ * link-local) for the daemon's CORS allowlist — the frontend may be loaded
+ * from any of these addresses, so every one of them has to be an accepted
+ * origin.
  */
 export async function getWebuiUrls(effects: T.Effects): Promise<string[]> {
   return sdk.host

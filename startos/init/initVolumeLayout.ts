@@ -49,8 +49,7 @@ export const initVolumeLayout = sdk.setupOnInit(
             '-c',
             `mkdir -p ${DATA_MOUNT}/${DB_SUBPATH} ${DATA_MOUNT}/${FILES_SUBPATH} && chown -R ${VIKUNJA_UID}:${VIKUNJA_GID} ${DATA_MOUNT}`,
           ],
-          { user: 'root' },
-          null,
+          { user: 'root', timeout: null },
         )
       },
     )

@@ -23,7 +23,7 @@ export const userSelect = (description: string) =>
           u.email ? `${u.username} (${u.email})` : u.username,
         ]),
       ),
-      default: '',
+      default: null,
       disabled:
         users === null
           ? i18n('Could not read the Vikunja account list.')

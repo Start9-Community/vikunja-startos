@@ -37,8 +37,15 @@ export const doctor = sdk.Action.withoutInput(
     return {
       version: '1' as const,
       title: i18n('Doctor Output'),
-      message: raw || i18n('Doctor produced no output.'),
-      result: null,
+      message: raw ? null : i18n('Doctor produced no output.'),
+      result: raw
+        ? {
+            type: 'multiline' as const,
+            value: raw,
+            copyable: true,
+            filename: 'vikunja-doctor.txt',
+          }
+        : null,
     }
   },
 )

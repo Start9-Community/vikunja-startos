@@ -26,7 +26,7 @@ const inputSpec = InputSpec.of({
   operation: Value.select({
     name: i18n('Repair Operation'),
     description: i18n(
-      'Everything — run all four checks in order. Task Positions — tasks appear in the wrong order or move around when the page reloads. Orphaned Projects — a project whose parent was deleted, which cannot be edited, un-archived, or deleted. File Types — attachments stored without a file type, usually after an upgrade. Orphaned Positions — leftover ordering records for tasks or views that no longer exist.',
+      '- Everything: run all four checks in order\n- Task Positions: tasks appear in the wrong order or move around when the page reloads\n- Orphaned Projects: a project whose parent was deleted, which cannot be edited, un-archived, or deleted\n- File Types: attachments stored without a file type, usually after an upgrade\n- Orphaned Positions: leftover ordering records for tasks or views that no longer exist',
     ),
     default: 'all',
     values: { all: i18n('Everything'), ...labels },
@@ -108,13 +108,15 @@ export const repair = sdk.Action.withInput(
     return {
       version: '1' as const,
       title: i18n('Repair Output'),
-      message: [
-        input.dryRun
-          ? i18n('Dry run — nothing was changed.')
-          : i18n('Repairs were applied.'),
-        report,
-      ].join('\n\n'),
-      result: null,
+      message: input.dryRun
+        ? i18n('Dry run — nothing was changed.')
+        : i18n('Repairs were applied.'),
+      result: {
+        type: 'multiline' as const,
+        value: report,
+        copyable: true,
+        filename: 'vikunja-repair.txt',
+      },
     }
   },
 )
