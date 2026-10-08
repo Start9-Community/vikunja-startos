@@ -10,7 +10,7 @@ export const primaryUrl = sdk.setupPrimaryUrl({
   metadata: {
     name: i18n('Set Primary URL'),
     description: i18n(
-      'Choose the URL Vikunja puts in the links it sends by email, such as invitations and password resets. Open UI opens this address.',
+      'Choose the URL Vikunja puts in the links it sends by email, such as invitations and password resets. Open UI opens this address when your connection can reach it.',
     ),
     warning: null,
     allowedStatuses: 'any',

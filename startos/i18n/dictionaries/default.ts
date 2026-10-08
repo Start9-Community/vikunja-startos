@@ -63,7 +63,7 @@ const dict = {
   'Primary URL': 59,
   'Used for email links and invitations. Every address Vikunja is reachable at works in the browser regardless of this setting.': 60,
   'Set Primary URL': 61,
-  'Choose the URL Vikunja puts in the links it sends by email, such as invitations and password resets. Open UI opens this address.': 62,
+  'Choose the URL Vikunja puts in the links it sends by email, such as invitations and password resets. Open UI opens this address when your connection can reach it.': 62,
   'New Password': 65,
   'Reset User Password': 66,
   'That account no longer exists.': 67,

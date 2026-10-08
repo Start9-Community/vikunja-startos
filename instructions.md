@@ -19,7 +19,7 @@
 2. Open the **Web UI** interface and log in with that username and password.
 3. To have Vikunja send email (password resets, reminders, invitations), run **Configure SMTP**, then **Send Test Email** to confirm a message arrives.
 
-Vikunja works at every address you expose it at — your `.local` address, a LAN IP, Tor, a custom domain — including ones you add later. **Set Primary URL** only chooses which of them goes into links in emails and which one **Open UI** opens. StartOS asks you to choose one after install.
+Vikunja works at every address you expose it at — your `.local` address, a LAN IP, Tor, a custom domain — including ones you add later. **Set Primary URL** only chooses which of them goes into links in emails and which one **Open UI** opens when your connection can reach it. StartOS asks you to choose one after install.
 
 ## Using Vikunja
 
@@ -46,7 +46,7 @@ Projects, tasks, kanban boards, gantt charts, table views, filters, labels and a
 
 **Other**
 
-- **Set Primary URL** — which address goes into links in emails, and which one **Open UI** opens. If its hostname is no longer offered by the interface, StartOS asks you to pick another. Vikunja prefers an available public domain (HTTPS first), then `.local`, then another offered address. If none are offered, it retains the stored URL.
+- **Set Primary URL** — which address goes into links in emails, and which one **Open UI** opens when your connection can reach it. If its hostname is no longer offered by the interface, StartOS asks you to pick another. Vikunja prefers an available public domain (HTTPS first), then `.local`, then another offered address. If none are offered, it retains the stored URL.
 - **Enable / Disable Link Sharing** — let people share a project through a public link. Off by default: anyone with the link can read every task and attachment in that project.
 - **Set Max Attachment Size** — the upload limit, such as `20MB` or `2GB`.
 - **Run Diagnostics** — Vikunja's built-in checks. Run it when something isn't working.

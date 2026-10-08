@@ -84,7 +84,7 @@ Storing settings under their environment-variable names means they pass straight
 
 **The accepted origins are computed from the interface's current addresses.** The frontend may be loaded from any address you have exposed, and every one of them has to be an accepted origin — so the list is rebuilt at start and is reactive, meaning adding a Tor address later re-runs with it already allowed.
 
-**The primary URL is used for outbound links and is what Open UI opens.** The daemon follows the chosen hostname, including changes to its port or scheme. If that hostname is absent, it prefers a public domain (HTTPS first), then `.local`, then another offered address. With no offered address, it retains a nonempty stored URL. Vikunja refuses to start when the primary URL is empty while cross-origin checking is on, so cross-origin checking is switched off when no URL can be resolved.
+**The primary URL is used for outbound links and is what Open UI prefers.** Open UI uses it when StartOS considers it reachable from the current session; an onion origin, for example, is used only from a Tor session. The daemon follows the chosen hostname, including changes to its port or scheme. If that hostname is absent, it prefers a public domain (HTTPS first), then `.local`, then another offered address. With no offered address, it retains a nonempty stored URL. Vikunja refuses to start when the primary URL is empty while cross-origin checking is on, so cross-origin checking is switched off when no URL can be resolved.
 
 ## Dependencies
 
@@ -176,7 +176,7 @@ Has no effect until SMTP is configured.
 
 #### Set Primary URL
 
-The address used in links in outgoing email, and the one Open UI opens, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless. While the chosen hostname is absent, the daemon uses the fallback described above and the task is raised again.
+The address used in links in outgoing email, and the one Open UI prefers when the current session can reach it, chosen from the addresses StartOS reports for the interface. It does not control access — every reachable address is accepted regardless. While the chosen hostname is absent, the daemon uses the fallback described above and the task is raised again.
 
 #### Enable / Disable Link Sharing
 
