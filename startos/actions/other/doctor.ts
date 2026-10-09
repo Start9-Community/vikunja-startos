@@ -1,5 +1,6 @@
 import { storeJson } from '../../fileModels/store.json'
 import { i18n } from '../../i18n'
+import { primaryUrl } from '../../primaryUrl'
 import { sdk } from '../../sdk'
 import { getVikunjaEnv, stripVikunjaLogs, withVikunjaCli } from '../../utils'
 
@@ -18,10 +19,17 @@ export const doctor = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
+    // Report the public URL the daemon actually runs with: `main` resolves a
+    // fallback while none is chosen, so the raw stored value reads as
+    // "not configured" when the service is fine.
+    const store = await storeJson.read().once()
+    const publicUrl = (await primaryUrl.bestUsable(effects).once()) ?? ''
     const raw = await withVikunjaCli(
       effects,
       'vikunja-doctor',
-      getVikunjaEnv(await storeJson.read().once()),
+      getVikunjaEnv(
+        store && { ...store, VIKUNJA_SERVICE_PUBLICURL: publicUrl },
+      ),
       async (sub, env) => {
         const res = await sub.exec(['/app/vikunja/vikunja', 'doctor'], {
           env,
