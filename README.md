@@ -188,7 +188,7 @@ The upload limit, as a size string such as `20MB` or `2GB`.
 
 #### Run Diagnostics
 
-Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lines are stripped so the report is what remains. The report comes back in a copyable box, also offered as `vikunja-doctor.txt`.
+Runs `vikunja doctor`. Read-only and safe at any time; Vikunja's startup log lines are stripped so the report is what remains. Its public URL line shows the address the daemon is running with, fallback included, not only an explicitly chosen one. The report comes back in a copyable box, also offered as `vikunja-doctor.txt`.
 
 #### Repair
 
