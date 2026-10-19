@@ -72,12 +72,11 @@ export const userResetPassword = sdk.Action.withInput(
       ),
       result: {
         type: 'single',
-        name: i18n('New Password'),
-        description: null,
         value: password,
         masked: true,
         copyable: true,
         qr: false,
+        launchable: false,
       },
     }
   },

@@ -115,6 +115,8 @@ export const repair = sdk.Action.withInput(
         type: 'multiline' as const,
         value: report,
         copyable: true,
+        qr: false,
+        masked: false,
         filename: 'vikunja-repair.txt',
       },
     }

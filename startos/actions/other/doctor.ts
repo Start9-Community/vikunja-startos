@@ -51,6 +51,8 @@ export const doctor = sdk.Action.withoutInput(
             type: 'multiline' as const,
             value: raw,
             copyable: true,
+            qr: false,
+            masked: false,
             filename: 'vikunja-doctor.txt',
           }
         : null,

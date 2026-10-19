@@ -36,7 +36,14 @@ export const userList = sdk.Action.withoutInput(
         version: '1' as const,
         title: i18n('Vikunja Users'),
         message: null,
-        result: { type: 'multiline' as const, value: raw, copyable: true },
+        result: {
+          type: 'multiline' as const,
+          value: raw,
+          copyable: true,
+          qr: false,
+          masked: false,
+          filename: null,
+        },
       }
     }
 
@@ -60,6 +67,7 @@ export const userList = sdk.Action.withoutInput(
                 masked: false,
                 copyable: true,
                 qr: false,
+                launchable: false,
               },
               {
                 type: 'single' as const,
@@ -69,6 +77,7 @@ export const userList = sdk.Action.withoutInput(
                 masked: false,
                 copyable: true,
                 qr: false,
+                launchable: false,
               },
               {
                 type: 'single' as const,
@@ -78,6 +87,7 @@ export const userList = sdk.Action.withoutInput(
                 masked: false,
                 copyable: true,
                 qr: false,
+                launchable: false,
               },
             ],
           })),
