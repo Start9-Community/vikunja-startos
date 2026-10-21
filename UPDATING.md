@@ -1,6 +1,6 @@
 # Updating the upstream version
 
-Vikunja runs the official `vikunja/vikunja` image, pinned by tag in the manifest. The Docker Hub tag tracks the GitHub release tag one-to-one, except that Docker Hub tags are bare semver while GitHub release tags carry a leading `v`.
+Vikunja runs the official `vikunja/vikunja` image, pinned by tag in the manifest. Both images are passed through the root `Dockerfile` as its `IMAGE` build argument, which only adds an empty `/proc` (see README § Image and Container Runtime), so the tag lives in `buildArgs`. The Docker Hub tag tracks the GitHub release tag one-to-one, except that Docker Hub tags are bare semver while GitHub release tags carry a leading `v`.
 
 ## Determining the upstream version
 
@@ -16,11 +16,12 @@ Vikunja runs the official `vikunja/vikunja` image, pinned by tag in the manifest
   curl -fsSL "https://hub.docker.com/v2/repositories/vikunja/vikunja/tags?page_size=20&ordering=last_updated" | jq -r '.results[].name'
   ```
 
-Compare against `images.vikunja.source.dockerTag` in `startos/manifest/index.ts` (the version after the `:` in `vikunja/vikunja:<version>`).
+Compare against `images.vikunja.source.dockerBuild.buildArgs.IMAGE` in `startos/manifest/index.ts` (the version after the `:` in `vikunja/vikunja:<version>`).
 
 ## Applying the bump
 
-- Bump `dockerTag` in `startos/manifest/index.ts` to `vikunja/vikunja:<new version>`, dropping the leading `v` from the GitHub release tag (Docker Hub tags are bare semver).
+- Bump `IMAGE` under `images.vikunja.source.dockerBuild.buildArgs` in `startos/manifest/index.ts` to `vikunja/vikunja:<new version>`, dropping the leading `v` from the GitHub release tag (Docker Hub tags are bare semver).
+- If the new image's working directory changed (`docker image inspect vikunja/vikunja:<version> --format '{{.Config.WorkingDir}}'`), update the `WORKDIR` build argument beside it; the `Dockerfile` restores whatever that argument says.
 
 ## Verifying the bump
 

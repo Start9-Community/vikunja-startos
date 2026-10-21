@@ -53,6 +53,8 @@ Two images: the application, and a shell for the jobs it cannot do itself.
 
 **BusyBox is there because the application image has no shell.** The directory layout and ownership work at init needs one, so a second image supplies it.
 
+**Both images are upstream's, rebuilt only to add an empty `/proc`.** The root `Dockerfile` takes the upstream image as a build argument (`IMAGE` in `startos/manifest/index.ts`) and adds nothing else. StartOS mounts procfs at `/proc` when any subcontainer starts and does not create the directory; since start-cli 2.4.0, an image whose layers lack it is packed without one, and every subcontainer on it fails with `mount procfs: ENOENT` ([Start9Labs/start-technologies#4301](https://github.com/Start9Labs/start-technologies/issues/4301)). Neither upstream image carries `/proc`. Once a start-cli release packs it again, the images can go back to plain `dockerTag` sources.
+
 ## Volume and Data Layout
 
 Two volumes, split by who owns the contents.

@@ -42,4 +42,5 @@ The why behind each of these is in `README.md`, under the section named; don't r
 - **Join `VIKUNJA_CORS_ORIGINS` with whitespace, not commas** (§ Quick Reference).
 - **Read a failed CLI run through `cliFailure`, never from `stderr` alone** (§ Actions).
 - **Never add `*-wal` back to the backup exclude list** (§ Backups and Restore).
+- **Keep both images on `dockerBuild` through the root `Dockerfile` until start-cli packs `/proc` again** — a plain `dockerTag` packs cleanly, then the install fails during init with `mount procfs: ENOENT` and rolls back (§ Image and Container Runtime).
 - **Run `python3 testing/injector.py disable` before committing** — `enable` also edits `startos/manifest/index.ts` and `startos/actions/index.ts`, and only the action file itself is gitignored (`testing/README.md`).
