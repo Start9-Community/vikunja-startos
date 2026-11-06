@@ -11,12 +11,12 @@ deliberately wire it in.
 
 ## The four faults
 
-| Repair operation   | Broken state                                                  | Symptom                                                       |
-| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| Repair operation   | Broken state                                                  | Symptom                                                        |
+| ------------------ | ------------------------------------------------------------- | -------------------------------------------------------------- |
 | `task-positions`   | Two tasks share a `position` in the same project view         | Tasks show in the wrong order, or jump when the page reloads   |
-| `projects`         | `projects.parent_project_id` points at a project that is gone  | The project can't be edited, un-archived, or deleted in the UI |
-| `file-mime-types`  | `files.mime` is empty                                         | Attachments download with no type                             |
-| `orphan-positions` | `task_positions` rows for a deleted task or view              | None directly — dead rows that skew ordering repairs          |
+| `projects`         | `projects.parent_project_id` points at a project that is gone | The project can't be edited, un-archived, or deleted in the UI |
+| `file-mime-types`  | `files.mime` is empty                                         | Attachments download with no type                              |
+| `orphan-positions` | `task_positions` rows for a deleted task or view              | None directly — dead rows that skew ordering repairs           |
 
 They come from history: older versions, interrupted writes, and importers (upstream names Trello
 imports for the orphaned-project case). **Current Vikunja will not produce them for you**, which is
@@ -159,12 +159,12 @@ Or drive both from **Actions → Other** in the web UI, where the injector sits 
 The injector prints the four fault counters before and after it writes, which is what each step is
 checked against:
 
-| After | duplicate positions | orphaned projects | files with no mime | orphan positions |
-| ------------------------ | --- | --- | --- | --- |
-| a clean install          | 0   | 0   | 0   | 0   |
-| `inject-test-faults` all | 1   | 1   | 1   | 2   |
-| Repair with dry run on   | 1   | 1   | 1   | 2   |
-| Repair with dry run off  | 0   | 0   | 0   | 0   |
+| After                    | duplicate positions | orphaned projects | files with no mime | orphan positions |
+| ------------------------ | ------------------- | ----------------- | ------------------ | ---------------- |
+| a clean install          | 0                   | 0                 | 0                  | 0                |
+| `inject-test-faults` all | 1                   | 1                 | 1                  | 2                |
+| Repair with dry run on   | 1                   | 1                 | 1                  | 2                |
+| Repair with dry run off  | 0                   | 0                 | 0                  | 0                |
 
 The middle row is the point of the dry run: it reported all four and changed nothing.
 

@@ -211,12 +211,18 @@ export function stripVikunjaLogs(text: string): string {
     .trim()
 }
 
-export type VikunjaUser = { id: string; username: string; email: string }
+export type VikunjaUser = {
+  id: string
+  username: string
+  email: string
+  // Vikunja's own label: Active, Locked, Disabled, Email Confirmation required
+  status: string
+}
 
 // Vikunja's `user list` prints an ASCII box-drawing table whose columns
 // auto-grow to fit the widest cell — rows are not wrapped. Each data row
 // looks like `│ 1  │ alice │ alice@example.com │ Active │ ... │`. We pull
-// ID/USERNAME/EMAIL from the first three cells; the header row is the
+// ID/USERNAME/EMAIL/STATUS from the first four cells; the header row is the
 // first `│`-line and is skipped by requiring a numeric ID.
 function parseUserTable(text: string): VikunjaUser[] {
   return text
@@ -232,6 +238,7 @@ function parseUserTable(text: string): VikunjaUser[] {
         id: cells[0] ?? '',
         username: cells[1] ?? '',
         email: cells[2] ?? '',
+        status: cells[3] ?? '',
       }
     })
     .filter((u) => /^\d+$/.test(u.id))
@@ -247,21 +254,27 @@ export async function listVikunjaUsers(
   effects: T.Effects,
   store: Store | null,
 ): Promise<{ raw: string; users: VikunjaUser[] }> {
-  const raw = await withVikunjaCli(
+  return withVikunjaCli(
     effects,
     'vikunja-user-list',
     getVikunjaEnv(store),
-    async (sub, env) => {
-      const res = await sub.execFail(['/app/vikunja/vikunja', 'user', 'list'], {
-        env,
-        user: 'vikunja',
-      })
-      return [res.stdout.toString(), res.stderr.toString()]
-        .map(stripVikunjaLogs)
-        .filter(Boolean)
-        .join('\n')
-    },
+    readUserList,
   )
+}
+
+/** `vikunja user list` inside a subcontainer an action already holds. */
+export async function readUserList(
+  sub: VikunjaSub,
+  env: Record<string, string>,
+): Promise<{ raw: string; users: VikunjaUser[] }> {
+  const res = await sub.execFail(['/app/vikunja/vikunja', 'user', 'list'], {
+    env,
+    user: 'vikunja',
+  })
+  const raw = [res.stdout.toString(), res.stderr.toString()]
+    .map(stripVikunjaLogs)
+    .filter(Boolean)
+    .join('\n')
   return { raw, users: parseUserTable(raw) }
 }
 

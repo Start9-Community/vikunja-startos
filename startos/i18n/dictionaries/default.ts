@@ -20,7 +20,7 @@ const dict = {
   'Users can currently delete their own accounts without admin approval. Run this action to require admin intervention.': 16,
   'Users must currently ask an admin to delete their account. Run this action to let them self-delete.': 17,
   'List Users': 18,
-  'Show every Vikunja user, with ID, username, and email.': 19,
+  'Show every Vikunja user, with ID, username, email, and status.': 19,
   'Vikunja Users': 20,
   'No users found.': 21,
   'Disable Link Sharing': 22,
@@ -92,7 +92,7 @@ const dict = {
   Accounts: 91,
   Other: 92,
   'Create a Vikunja user. A strong password is generated and returned below — the user can change it later in Vikunja.': 93,
-  'Generate a new password for a user and return it — use this to recover access if a password is lost. No email is sent.': 94,
+  'Generate a new password for a user and return it, and unlock the account if Vikunja locked it after too many failed sign-ins. Use this to recover access if a password is lost. No email is sent.': 94,
 
   // Init progress phases, shown in the StartOS install/update bar.
   'Seeding configuration': 95,
@@ -130,6 +130,11 @@ const dict = {
   'Vikunja will stop emailing task reminders to users.': 125,
   'Vikunja will start emailing users reminders for their assigned and overdue tasks.': 126,
   'Users will no longer be able to share projects through a public link.': 127,
+
+  // Account lockout (Vikunja 2.8)
+  Status: 128,
+  'Vikunja could not unlock the account: ${stderr}': 129,
+  'The account was locked after too many failed sign-ins and is unlocked now. Share the new password with the user over a secure channel.': 130,
 } as const
 
 /**

@@ -32,8 +32,8 @@ Projects, tasks, kanban boards, gantt charts, table views, filters, labels and a
 **Accounts**
 
 - **Create User** — add an account. You enter a username and email; Vikunja generates the password and shows it once.
-- **List Users** — every account's ID, username and email.
-- **Reset User Password** — pick an account from the list and get a new password for it. No email is sent. Use it when someone is locked out.
+- **List Users** — every account's ID, username, email and status. `Locked` means Vikunja locked it after 10 failed sign-ins.
+- **Reset User Password** — pick an account from the list and get a new password for it. It also unlocks a `Locked` account. No email is sent. Use it when someone is locked out.
 - **Delete User** — pick an account from the list and delete it, with all of its projects, tasks and attachments. This cannot be undone.
 - **Enable Registration / Disable Registration** — let people sign up on their own. It is off by default; if you turn it on, turn it off again once they have signed up.
 - **Enable / Disable Self-Service User Deletion** — whether people can delete their own accounts. It is on by default.
