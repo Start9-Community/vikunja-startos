@@ -53,8 +53,6 @@ Two images: the application, and a shell for the jobs it cannot do itself.
 
 **BusyBox is there because the application image has no shell.** The directory layout and ownership work at init needs one, so a second image supplies it.
 
-**Both images are upstream's, rebuilt only to add an empty `/proc`.** The root `Dockerfile` takes the upstream image as a build argument (`IMAGE` in `startos/manifest/index.ts`) and adds nothing else. StartOS mounts procfs at `/proc` when any subcontainer starts and does not create the directory; since start-cli 2.4.0, an image whose layers lack it is packed without one, and every subcontainer on it fails with `mount procfs: ENOENT` ([Start9Labs/start-technologies#4301](https://github.com/Start9Labs/start-technologies/issues/4301)). Neither upstream image carries `/proc`. Once a start-cli release packs it again, the images can go back to plain `dockerTag` sources.
-
 ## Volume and Data Layout
 
 Two volumes, split by who owns the contents.
@@ -134,14 +132,16 @@ The way to make the first account, and any later one while public registration i
 
 #### List Users
 
-Read-only. If Vikunja ever changes its table format, the action shows the raw output rather than an empty list.
+Read-only. Each account shows its ID, username, email and Vikunja's status for it: `Active`, `Locked`, `Disabled` or `Email Confirmation required`. If Vikunja ever changes its table format, the action shows the raw output rather than an empty list.
 
 #### Reset User Password
 
 For a locked-out user, or to prove an account survived a restore.
 
+**It also unlocks the account.** Vikunja locks an account after 10 failed sign-ins (or two-factor codes) until its password is reset, and only its emailed reset link clears the lock; `vikunja user reset-password --direct` changes the password and leaves the account locked. Without SMTP the lock email is never sent, so this action is the only way back in. When `user list` reports the account `Locked`, the action runs `vikunja user change-status <id> --enable` before setting the password. A `Disabled` account stays disabled.
+
 - **Input:** the account, picked from a list read from the database when the form opens.
-- **Outputs:** a new generated password, shown once. No email is sent.
+- **Outputs:** a new generated password, shown once, and a note when the account was unlocked. No email is sent.
 - **Repeat safety:** every run replaces the password again.
 
 #### Delete User

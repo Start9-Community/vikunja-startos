@@ -8,7 +8,9 @@ export const userList = sdk.Action.withoutInput(
 
   {
     name: i18n('List Users'),
-    description: i18n('Show every Vikunja user, with ID, username, and email.'),
+    description: i18n(
+      'Show every Vikunja user, with ID, username, email, and status.',
+    ),
     warning: null,
     allowedStatuses: 'any',
     group: i18n('Accounts'),
@@ -86,6 +88,16 @@ export const userList = sdk.Action.withoutInput(
                 value: u.email,
                 masked: false,
                 copyable: true,
+                qr: false,
+                launchable: false,
+              },
+              {
+                type: 'single' as const,
+                name: i18n('Status'),
+                description: null,
+                value: u.status,
+                masked: false,
+                copyable: false,
                 qr: false,
                 launchable: false,
               },

@@ -1,103 +1,113 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '2.7.1:0',
+  version: '2.8.0:0',
   releaseNotes: {
-    en_US: `Updated Vikunja to 2.7.1.
+    en_US: `Updated Vikunja to 2.8.0. Requires StartOS 0.4.1 or later.
 
 **Security**
 
-- Fixes 41 vulnerabilities, two rated high: deleting an account, even a bot, could give read-only collaborators admin or owner rights on its projects, and a crafted Kanban move could leak tasks to project webhooks. Among the rest, logins stayed valid briefly after logout or a password change, read-only members could see webhook URLs, turning two-factor authentication on or off did not ask for your password or a current code, and attachments and the database were saved readable by every account on the system.
+- Fixes 19 vulnerabilities, three rated high. The most serious let any signed-in user read other users' files, such as attachments and data exports, and let overdue-task webhooks send other users' private projects to an outside address. Among the rest, a used two-factor code could be replayed in altered form, a failed Trello import wrote the Trello API token to the logs, and crafted calendar syncs, imports, exports, images or task descriptions could tie up the server's memory or CPU.
+
+**New**
+
+- Deleted tasks and projects go to a trash bin, with an undo button, and can be restored for 30 days.
+- After 10 failed sign-ins, Vikunja locks the account until its password is reset. With SMTP set up, the owner is emailed a reset link. Reset User Password now unlocks the account too, and List Users shows each account's status.
+- Quick Add Magic understands phrases like "in two weeks", and time-tracking entries show who tracked them.
 
 **Changes**
 
-- A Kanban view holds at most 100 manual buckets and 50 filter buckets, and one import at most 100,000 items.
-- API token permissions have new names. Existing tokens are converted automatically; scripts that create tokens through the API need the new names.
+- Reminders and overdue notices now follow task subscriptions: unsubscribing from a task stops them, even for its creator and assignees. The update subscribes creators and assignees to their existing tasks, so anyone who had unsubscribed from one needs to unsubscribe again.
 
 **Fixes**
 
-- This update installs. The previous one, 2.7.0:1, failed during setup and was rolled back to the version you had.
-- Bulk edits no longer clear assignees, reminders or favorites you did not change.
-- Tasks repeating monthly on the 31st no longer skip months.
-- Quick Add Magic no longer reads a date range as a due date.
+- Memory use no longer grows while the service runs.
 
-[Full upstream release notes](https://vikunja.io/changelog/vikunja-2.7.1-was-released/)`,
-    es_ES: `Vikunja actualizado a 2.7.1.
+[Full upstream release notes](https://vikunja.io/changelog/vikunja-2.8.0-was-released/)`,
+    es_ES: `Vikunja actualizado a 2.8.0. Requiere StartOS 0.4.1 o posterior.
 
 **Seguridad**
 
-- Corrige 41 vulnerabilidades, dos de gravedad alta: eliminar una cuenta, incluso la de un bot, podía dar a colaboradores de solo lectura derechos de administrador o propietario sobre sus proyectos, y un movimiento de Kanban manipulado podía filtrar tareas a los webhooks del proyecto. Entre las demás, las sesiones seguían siendo válidas un momento tras cerrar sesión o cambiar la contraseña, los miembros de solo lectura podían ver las URL de los webhooks, activar o desactivar la autenticación en dos pasos no pedía su contraseña ni un código actual, y los adjuntos y la base de datos se guardaban legibles para todas las cuentas del sistema.
+- Corrige 19 vulnerabilidades, tres de gravedad alta. Las más graves permitían a cualquier usuario con sesión iniciada leer archivos de otros usuarios, como adjuntos y exportaciones de datos, y hacían que los webhooks de tareas vencidas enviaran proyectos privados de otros usuarios a una dirección externa. Entre las demás, un código de doble factor ya usado podía reutilizarse modificado, una importación fallida de Trello escribía el token de la API de Trello en los registros, y sincronizaciones de calendario, importaciones, exportaciones, imágenes o descripciones de tareas manipuladas podían acaparar la memoria o la CPU del servidor.
+
+**Novedades**
+
+- Las tareas y proyectos eliminados van a una papelera, con un botón de deshacer, y pueden restaurarse durante 30 días.
+- Tras 10 inicios de sesión fallidos, Vikunja bloquea la cuenta hasta que se restablezca su contraseña. Con SMTP configurado, el propietario recibe por correo un enlace de restablecimiento. Restablecer contraseña de usuario ahora también desbloquea la cuenta, y Listar usuarios muestra el estado de cada cuenta.
+- Quick Add Magic entiende frases como «en dos semanas», y las entradas de seguimiento de tiempo muestran quién las registró.
 
 **Cambios**
 
-- Una vista Kanban admite como máximo 100 columnas manuales y 50 columnas de filtro, y una importación como máximo 100 000 elementos.
-- Los permisos de los tokens de API tienen nombres nuevos. Los tokens existentes se convierten automáticamente; los scripts que crean tokens mediante la API necesitan los nombres nuevos.
+- Los recordatorios y avisos de vencimiento ahora siguen las suscripciones a tareas: cancelar la suscripción a una tarea los detiene, incluso para su creador y sus asignados. La actualización suscribe a creadores y asignados a sus tareas existentes, así que quien hubiera cancelado la suscripción a una debe cancelarla de nuevo.
 
 **Correcciones**
 
-- Esta actualización se instala. La anterior, 2.7.0:1, fallaba durante la configuración y se revertía a la versión que tenía.
-- Las ediciones masivas ya no borran asignaciones, recordatorios ni favoritos que usted no cambió.
-- Las tareas que se repiten cada mes el día 31 ya no se saltan meses.
-- Quick Add Magic ya no interpreta un rango de fechas como fecha de vencimiento.
+- El uso de memoria ya no crece mientras el servicio está en ejecución.
 
-[Notas de la versión completas](https://vikunja.io/changelog/vikunja-2.7.1-was-released/)`,
-    de_DE: `Vikunja auf 2.7.1 aktualisiert.
+[Notas de la versión completas](https://vikunja.io/changelog/vikunja-2.8.0-was-released/)`,
+    de_DE: `Vikunja auf 2.8.0 aktualisiert. Erfordert StartOS 0.4.1 oder neuer.
 
 **Sicherheit**
 
-- Behebt 41 Sicherheitslücken, zwei davon mit hohem Schweregrad: Das Löschen eines Kontos, selbst eines Bots, konnte Mitarbeitenden mit Lesezugriff Administrator- oder Eigentümerrechte an dessen Projekten geben, und eine manipulierte Kanban-Verschiebung konnte Aufgaben an Projekt-Webhooks durchsickern lassen. Unter den übrigen: Anmeldungen blieben nach dem Abmelden oder einer Passwortänderung kurz gültig, Mitglieder mit Lesezugriff konnten Webhook-URLs sehen, das Ein- oder Ausschalten der Zwei-Faktor-Authentifizierung verlangte weder Ihr Passwort noch einen aktuellen Code, und Anhänge und die Datenbank wurden für alle Konten des Systems lesbar gespeichert.
+- Behebt 19 Sicherheitslücken, drei davon mit hohem Schweregrad. Die schwersten erlaubten jedem angemeldeten Benutzer, Dateien anderer Benutzer wie Anhänge und Datenexporte zu lesen, und ließen Webhooks für überfällige Aufgaben private Projekte anderer Benutzer an eine externe Adresse senden. Unter den übrigen: Ein bereits verwendeter Zwei-Faktor-Code ließ sich abgewandelt erneut verwenden, ein fehlgeschlagener Trello-Import schrieb das Trello-API-Token in die Protokolle, und manipulierte Kalendersynchronisationen, Importe, Exporte, Bilder oder Aufgabenbeschreibungen konnten Speicher oder CPU des Servers blockieren.
+
+**Neu**
+
+- Gelöschte Aufgaben und Projekte landen in einem Papierkorb, mit einer Rückgängig-Schaltfläche, und lassen sich 30 Tage lang wiederherstellen.
+- Nach 10 fehlgeschlagenen Anmeldungen sperrt Vikunja das Konto, bis sein Passwort zurückgesetzt wird. Ist SMTP eingerichtet, erhält der Inhaber einen Link zum Zurücksetzen per E-Mail. "Benutzerpasswort zurücksetzen" entsperrt das Konto jetzt ebenfalls, und "Benutzer auflisten" zeigt den Status jedes Kontos.
+- Quick Add Magic versteht Ausdrücke wie "in zwei Wochen", und Zeiterfassungseinträge zeigen, wer sie erfasst hat.
 
 **Änderungen**
 
-- Eine Kanban-Ansicht fasst höchstens 100 manuelle und 50 Filter-Spalten, ein Import höchstens 100.000 Einträge.
-- API-Token-Berechtigungen haben neue Namen. Bestehende Tokens werden automatisch umgestellt; Skripte, die Tokens über die API erstellen, brauchen die neuen Namen.
+- Erinnerungen und Überfälligkeitshinweise richten sich jetzt nach Aufgabenabonnements: Wer eine Aufgabe abbestellt, erhält sie nicht mehr, auch als Ersteller oder zugewiesene Person. Das Update abonniert Ersteller und zugewiesene Personen für ihre bestehenden Aufgaben; wer eine davon abbestellt hatte, muss sie erneut abbestellen.
 
 **Fehlerbehebungen**
 
-- Dieses Update lässt sich installieren. Das vorherige, 2.7.0:1, schlug bei der Einrichtung fehl und wurde auf Ihre bisherige Version zurückgesetzt.
-- Massenbearbeitungen löschen keine Zuweisungen, Erinnerungen oder Favoriten mehr, die Sie nicht geändert haben.
-- Monatlich am 31. wiederkehrende Aufgaben überspringen keine Monate mehr.
-- Quick Add Magic liest einen Datumsbereich nicht mehr als Fälligkeitsdatum.
+- Der Speicherverbrauch steigt während der Laufzeit des Dienstes nicht mehr an.
 
-[Vollständige Versionshinweise](https://vikunja.io/changelog/vikunja-2.7.1-was-released/)`,
-    pl_PL: `Vikunja zaktualizowana do 2.7.1.
+[Vollständige Versionshinweise](https://vikunja.io/changelog/vikunja-2.8.0-was-released/)`,
+    pl_PL: `Zaktualizowano Vikunja do wersji 2.8.0. Wymaga StartOS 0.4.1 lub nowszego.
 
 **Bezpieczeństwo**
 
-- Naprawia 41 luk, w tym dwie o wysokiej wadze: usunięcie konta, nawet konta bota, mogło dać współpracownikom z dostępem tylko do odczytu prawa administratora lub właściciela w jego projektach, a spreparowane przeniesienie w Kanbanie mogło ujawnić zadania webhookom projektu. Wśród pozostałych: sesje pozostawały przez chwilę ważne po wylogowaniu lub zmianie hasła, członkowie z dostępem tylko do odczytu widzieli adresy URL webhooków, włączanie i wyłączanie uwierzytelniania dwuskładnikowego nie wymagało hasła ani bieżącego kodu, a załączniki i baza danych były zapisywane jako czytelne dla każdego konta w systemie.
+- Naprawia 19 luk, trzy o wysokiej wadze. Najpoważniejsze pozwalały każdemu zalogowanemu użytkownikowi odczytać pliki innych użytkowników, takie jak załączniki i eksporty danych, oraz sprawiały, że webhooki zaległych zadań wysyłały prywatne projekty innych użytkowników na zewnętrzny adres. Wśród pozostałych: użyty kod dwuskładnikowy można było ponownie wykorzystać w zmienionej postaci, nieudany import z Trello zapisywał token API Trello w logach, a spreparowane synchronizacje kalendarza, importy, eksporty, obrazy lub opisy zadań mogły zająć pamięć lub procesor serwera.
+
+**Nowości**
+
+- Usunięte zadania i projekty trafiają do kosza, z przyciskiem cofnięcia, i można je przywrócić przez 30 dni.
+- Po 10 nieudanych logowaniach Vikunja blokuje konto do czasu zresetowania hasła. Gdy SMTP jest skonfigurowany, właściciel otrzymuje e-mailem link do resetu. Resetuj hasło użytkownika teraz także odblokowuje konto, a Lista użytkowników pokazuje stan każdego konta.
+- Quick Add Magic rozumie wyrażenia takie jak „za dwa tygodnie”, a wpisy śledzenia czasu pokazują, kto je zarejestrował.
 
 **Zmiany**
 
-- Widok Kanban mieści najwyżej 100 ręcznych kolumn i 50 kolumn filtrów, a jeden import najwyżej 100 000 elementów.
-- Uprawnienia tokenów API mają nowe nazwy. Istniejące tokeny są przekształcane automatycznie; skrypty tworzące tokeny przez API potrzebują nowych nazw.
+- Przypomnienia i powiadomienia o zaległościach podążają teraz za subskrypcjami zadań: rezygnacja z subskrypcji zadania je wyłącza, także dla twórcy i przypisanych osób. Aktualizacja subskrybuje twórców i przypisane osoby do ich istniejących zadań, więc kto zrezygnował z któregoś, musi zrobić to ponownie.
 
 **Poprawki**
 
-- Ta aktualizacja się instaluje. Poprzednia, 2.7.0:1, kończyła się błędem podczas konfiguracji i była wycofywana do posiadanej wersji.
-- Edycja zbiorcza nie czyści już przypisań, przypomnień ani ulubionych, których nie zmieniono.
-- Zadania powtarzane co miesiąc 31. dnia nie pomijają już miesięcy.
-- Quick Add Magic nie odczytuje już zakresu dat jako terminu.
+- Zużycie pamięci nie rośnie już podczas działania usługi.
 
-[Pełne informacje o wydaniu](https://vikunja.io/changelog/vikunja-2.7.1-was-released/)`,
-    fr_FR: `Vikunja mis à jour en 2.7.1.
+[Pełne informacje o wydaniu](https://vikunja.io/changelog/vikunja-2.8.0-was-released/)`,
+    fr_FR: `Vikunja mis à jour vers 2.8.0. Nécessite StartOS 0.4.1 ou une version ultérieure.
 
 **Sécurité**
 
-- Corrige 41 vulnérabilités, dont deux de gravité élevée : supprimer un compte, même celui d'un bot, pouvait donner à des collaborateurs en lecture seule des droits d'administrateur ou de propriétaire sur ses projets, et un déplacement Kanban forgé pouvait divulguer des tâches aux webhooks du projet. Parmi les autres : les sessions restaient brièvement valides après une déconnexion ou un changement de mot de passe, les membres en lecture seule pouvaient voir les URL des webhooks, activer ou désactiver l'authentification à deux facteurs ne demandait ni votre mot de passe ni un code actuel, et les pièces jointes et la base de données étaient enregistrées lisibles par tous les comptes du système.
+- Corrige 19 vulnérabilités, dont trois de gravité élevée. Les plus graves permettaient à tout utilisateur connecté de lire les fichiers d'autres utilisateurs, comme les pièces jointes et les exports de données, et faisaient envoyer par les webhooks de tâches en retard les projets privés d'autres utilisateurs vers une adresse externe. Parmi les autres, un code à deux facteurs déjà utilisé pouvait être rejoué sous une forme modifiée, un import Trello échoué écrivait le jeton d'API Trello dans les journaux, et des synchronisations de calendrier, imports, exports, images ou descriptions de tâches malveillants pouvaient monopoliser la mémoire ou le processeur du serveur.
+
+**Nouveautés**
+
+- Les tâches et projets supprimés vont dans une corbeille, avec un bouton d'annulation, et peuvent être restaurés pendant 30 jours.
+- Après 10 connexions échouées, Vikunja verrouille le compte jusqu'à la réinitialisation de son mot de passe. Si SMTP est configuré, le titulaire reçoit un lien de réinitialisation par e-mail. Réinitialiser le mot de passe utilisateur déverrouille désormais aussi le compte, et Lister les utilisateurs affiche le statut de chaque compte.
+- Quick Add Magic comprend des expressions comme « dans deux semaines », et les entrées de suivi du temps indiquent qui les a saisies.
 
 **Changements**
 
-- Une vue Kanban contient au plus 100 colonnes manuelles et 50 colonnes de filtre, et un import au plus 100 000 éléments.
-- Les permissions des jetons d'API ont de nouveaux noms. Les jetons existants sont convertis automatiquement ; les scripts qui créent des jetons via l'API ont besoin des nouveaux noms.
+- Les rappels et avis de retard suivent désormais les abonnements aux tâches : se désabonner d'une tâche les arrête, même pour son créateur et ses assignés. La mise à jour abonne les créateurs et assignés à leurs tâches existantes ; qui s'était désabonné de l'une d'elles doit donc se désabonner à nouveau.
 
 **Corrections**
 
-- Cette mise à jour s'installe. La précédente, 2.7.0:1, échouait pendant la configuration et revenait à la version que vous aviez.
-- Les modifications groupées n'effacent plus les assignations, rappels ou favoris que vous n'avez pas modifiés.
-- Les tâches répétées chaque mois le 31 ne sautent plus de mois.
-- Quick Add Magic ne lit plus une plage de dates comme une date d'échéance.
+- La consommation de mémoire n'augmente plus pendant le fonctionnement du service.
 
-[Notes de version complètes](https://vikunja.io/changelog/vikunja-2.7.1-was-released/)`,
+[Notes de version complètes](https://vikunja.io/changelog/vikunja-2.8.0-was-released/)`,
   },
   migrations: {
     up: async ({ effects }) => {},
